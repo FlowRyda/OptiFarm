@@ -1,0 +1,30 @@
+<app-map-panel-layout
+  [enableUserLocation]="false"
+  (markerDragged)="onMarkerDragged($event)"
+  (mapClick)="onMapClicked($event)"
+  (mapReady)="onMapReady($event)"
+>
+  <ng-container *ngIf="!isLoading && formConfig">
+    <app-panel-layout
+      [title]="formConfig.title"
+      [subtitle]="formConfig.subtitle"
+      [actionButtons]="formConfig.actionButtons"
+      [backAction]="formConfig.backAction">
+
+      <app-garage-form
+        details
+        [form]="garageForm"
+        [formConfig]="formConfig"
+        [successMessage]="successMessage"
+        [errorMessage]="errorMessage"
+        (submitForm)="onSubmit()"
+        (addressSelected)="onAddressSelected($event)"
+      ></app-garage-form>
+
+    </app-panel-layout>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && errorMessage">
+    <p class="text-danger text-center">{{ errorMessage }}</p>
+  </ng-container>
+</app-map-panel-layout>

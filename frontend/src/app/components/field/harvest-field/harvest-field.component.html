@@ -1,0 +1,95 @@
+<div class="flex-grow-1">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+
+      <app-map [loadFields]="false"
+               (mapReady)="onMapReady($event)">
+      </app-map>
+    </div>
+
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+
+
+      <ng-container *ngIf="isLoading">
+        <p class="text-center page-subtitle">Loading harvesting page...</p>
+      </ng-container>
+      <ng-container *ngIf="!isLoading && activeField">
+
+        <app-panel-layout
+          [title]="activeField.name || 'Harvest Field'"
+          [subtitle]="'Harvest Page of the selected Field'"
+          [backAction]="backActionConfig"
+          [actionButtons]="actionButtonsConfig">
+          <div details>
+            <form [formGroup]="harvestForm" (ngSubmit)="onSubmit()">
+
+              <app-info-field label="Field Name:" value="{{ activeField.name }}"></app-info-field>
+
+              <app-info-field label="Used Seed:" value="{{ activeField.seedName }}"></app-info-field>
+
+              <app-info-field label="Buying Price:" value="${{ activeField.seedPrice }}"></app-info-field>
+
+              <app-info-field label="Selling Price:" value="${{ activeField.sellingPrice }}"></app-info-field>
+
+              <div class="mb-4">
+                <app-edit-field type="number" formControlName="currentPrice" label="Current Price ($):"
+                                placeholder="150.00"></app-edit-field>
+
+                <div *ngIf="currentPrice?.invalid && currentPrice?.touched" class="text-danger">
+                  Price must be 0 or more.
+                </div>
+              </div>
+
+              <app-info-field label="Planted Date:"
+                              value="{{ activeField.plantedDate | date: 'd. MMMM yyyy' }} ({{ getDaysAgo(activeField.plantedDate) }} days ago)"></app-info-field>
+
+              <app-info-field label="Expected Harvest Date:"
+                              value="{{ activeField.expectedDate | date: 'd. MMMM yyyy' }} ({{ calculateDaysRemaining(activeField.expectedDate) }} days remaining)"></app-info-field>
+              <div class="mb-4">
+                <app-edit-field type="datetime-local" formControlName="harvestDate"
+                                label="Harvest Date:"></app-edit-field>
+
+                <div *ngIf="harvestDate?.invalid && harvestDate?.touched" class="text-danger">
+                  Harvest date is required.
+                </div>
+              </div>
+
+              <app-info-field label="Crop Progress:" value="{{ activeField.growthStatus }}%"></app-info-field>
+
+              <div class="mb-4">
+                <app-edit-field type="number" formControlName="yield" label="Yield (tons):"
+                                placeholder="2500"></app-edit-field>
+
+                <div *ngIf="yield?.invalid && yield?.touched" class="text-danger">
+                  Yield must be 0 or higher.
+                </div>
+              </div>
+            </form>
+          </div>
+        </app-panel-layout>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<app-confirmation-dialog
+  *ngIf="showDeleteDialog"
+  title="Remove Planting Process"
+  [message]="'Are you sure you want to remove the ' + (activeField?.seedName || 'seed') + ' from ' + (activeField?.name || 'this field') + '? This will discard all planting progress.'"
+  confirmLabel="Remove"
+  cancelLabel="Cancel"
+  [danger]="true"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()">
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showCancelDialog"
+  [title]="'Discard changes?'"
+  [message]="'All unsaved changes will be lost.'"
+  [confirmLabel]="'Discard'"
+  [cancelLabel]="'Keep editing'"
+  [danger]="true"
+  (confirmed)="confirmDiscardChanges()"
+  (cancelled)="keepEditing()"
+></app-confirmation-dialog>

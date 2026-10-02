@@ -1,0 +1,122 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white navbar-shadow">
+  <div class="container-fluid px-3 align-items-center">
+    <a class="navbar-brand d-flex" routerLink="/">
+      <img src="assets/images/logo.png" alt="OptiFarm Logo" class="logo-icon">
+      <span class="navbar-app-name">OptiFarm</span>
+    </a>
+
+    <!-- Dropdown Toggle for slim display -->
+    <div class="dropdown d-lg-none ms-1" *ngIf="authService.isLoggedIn()">
+      <a class="nav-link dropdown-toggle-custom"
+         id="navbarDropdown"
+         role="button"
+         data-bs-toggle="dropdown"
+         aria-expanded="false">
+        Menu
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li *ngFor="let item of navigationItems">
+          <a class="dropdown-item" [routerLink]="item.route" routerLinkActive="active">{{ item.label }}</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Log in/Sign up for mobile -->
+    <div class="dropdown d-lg-none ms-1" *ngIf="!authService.isLoggedIn()">
+      <a class="nav-link dropdown-toggle-custom"
+         id="authDropdown"
+         role="button"
+         data-bs-toggle="dropdown"
+         aria-expanded="false">
+        Menu
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="authDropdown">
+        <li>
+          <a class="dropdown-item" routerLink="/login" routerLinkActive="active">Log in</a>
+        </li>
+        <li>
+          <a class="dropdown-item" routerLink="/signup" routerLinkActive="active">Sign up</a>
+        </li>
+      </ul>
+    </div>
+    <div class=" ms-auto dropdown d-lg-none ms-2" *ngIf="authService.isLoggedIn()">
+      <a class="nav-link dropdown-toggle-custom"
+         id="mobileUserDropdown"
+         role="button"
+         data-bs-toggle="dropdown"
+         aria-expanded="false">
+        <i class="bi bi-person-fill"></i>
+      </a>
+
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileUserDropdown">
+        <li>
+          <a class="dropdown-item" routerLink="/farmer/details">
+            <i class="bi bi-sliders2"></i>
+            Preferences</a>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <a class="dropdown-item" (click)="authService.logoutUser()">
+            <i class="bi bi-box-arrow-right"></i>
+            Log out
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Desktop Navigation -->
+    <div class="d-none d-lg-block" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-1" *ngIf="authService.isLoggedIn()">
+        <li class="nav-item me-2" *ngFor="let item of navigationItems">
+          <a class="nav-link nav-link-custom" [routerLink]="item.route" routerLinkActive="active">
+            {{ item.label }}
+          </a>
+        </li>
+      </ul>
+    </div>
+    <!-- Desktop Log in/Sign up -->
+    <div class="ms-auto d-none d-lg-block" *ngIf="!authService.isLoggedIn()">
+      <ul class="navbar-nav ms-1">
+        <li class="nav-item me-3">
+          <a class="nav-link" routerLink="/login" routerLinkActive="active">
+            Log in
+          </a>
+        </li>
+        <li class="nav-item me-3">
+          <a class="nav-link" routerLink="/signup" routerLinkActive="active">
+            Sign up
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Desktop: User Dropdown -->
+    <div class="ms-auto d-none d-lg-block" *ngIf="authService.isLoggedIn()">
+      <div class="dropdown">
+        <a class="nav-link dropdown-toggle nav-link-custom"
+           id="userDropdown"
+           role="button"
+           data-bs-toggle="dropdown"
+           aria-expanded="false">
+          <i class="bi bi-person-fill"></i>
+        </a>
+
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li>
+            <a class="dropdown-item" routerLink="/farmer/details">
+              <i class="bi bi-sliders2"></i>
+              Preferences</a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <a class="dropdown-item" (click)="authService.logoutUser()" routerLink="/">
+              <i class="bi bi-box-arrow-right"></i>
+              Log out
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</nav>

@@ -1,0 +1,38 @@
+<div class="container">
+  <ng-container *ngIf="isLoading">
+    <p class="text-center page-subtitle">Loading your data...</p>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && farmerDetails && farmerDetailConfig">
+    <app-panel-layout
+      [title]="farmerDetailConfig.title"
+      [subtitle]="farmerDetailConfig.subtitle"
+      [actionButtons]="farmerDetailConfig.actionButtons"
+      [backAction]="farmerDetailConfig.backAction">
+
+      <div details>
+        <app-info-field
+          *ngFor="let field of farmerDetailConfig.fields"
+          [label]="field.label"
+          [value]="field.value">
+        </app-info-field>
+      </div>
+    </app-panel-layout>
+
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && errorMessage">
+    <p class="text-danger text-center">{{ errorMessage }}</p>
+  </ng-container>
+
+  <app-confirmation-dialog
+    *ngIf="showDeleteModal"
+    [title]="'Delete your Account?'"
+    [message]="'Your account will be permanently deleted.'"
+    [confirmLabel]="'Delete'"
+    [cancelLabel]="'Cancel'"
+    [danger]="true"
+    (confirmed)="confirmDelete()"
+    (cancelled)="closeDeleteModal()"
+  ></app-confirmation-dialog>
+</div>

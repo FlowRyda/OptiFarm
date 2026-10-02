@@ -1,0 +1,198 @@
+<h2 mat-dialog-title class="task-dialog-title">Add New Task</h2>
+
+<mat-dialog-content class="task-dialog-content">
+  <form [formGroup]="taskForm">
+
+    <!-- Name Input -->
+    <div class="mb-4">
+      <app-edit-field
+        label="Name"
+        type="text"
+        placeholder="Task name"
+        formControlName="name">
+      </app-edit-field>
+      <div *ngIf="taskForm.get('name')?.invalid && taskForm.get('name')?.touched"
+           class="text-danger">
+        Name is required.
+      </div>
+    </div>
+
+    <!-- Field Dropdown (styled like Garage) -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <label for="fieldId" class="form-label large-label">Field</label>
+      </div>
+
+      <select
+        id="fieldId"
+        class="form-control large-input"
+        formControlName="field"
+        required
+      >
+        <option value="" disabled selected hidden>Select a field</option>
+        <option *ngFor="let f of availableFields" [value]="f.id">
+          {{ f.name }}
+        </option>
+      </select>
+
+      <div *ngIf="taskForm.get('field')?.invalid && taskForm.get('field')?.touched"
+           class="text-danger">
+        Field is required.
+      </div>
+    </div>
+
+    <!-- Categories Dropdown -->
+    <div class="mb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <label for="categoriesId"
+               class="form-label large-label"
+               [class.text-muted]="taskForm.get('categories')?.disabled">
+          Select Categories and or Tools (at least one selection)
+        </label>
+      </div>
+
+      <app-tool-selector
+        [categories]="dropdownCategories"
+        (selectionChange)="onSelectionChange($event)">
+      </app-tool-selector>
+      <div *ngIf="
+        taskForm.hasError('atLeastOne') &&
+        (
+          (taskForm.get('tools')?.disabled && taskForm.get('categories')?.touched) ||
+          (taskForm.get('tools')?.enabled &&
+          taskForm.get('categories')?.touched &&
+          taskForm.get('tools')?.touched)
+        )
+      " class="text-danger">
+        At least one category or tool must be selected.
+      </div>
+    </div>
+
+    <!-- Work Time Estimate Input -->
+    <div class="mb-4">
+      <app-edit-field
+        label="Work Time Estimate"
+        [labelTooltip]="'In hours, will be rounded up to the next full 15 minutes.'"
+        type="number"
+        placeholder="Hours"
+        formControlName="workTimeEstimate"
+        (blurred)="onWorkTimeEstimateBlur()">
+        >
+      </app-edit-field>
+      <div *ngIf="taskForm.get('workTimeEstimate')?.invalid && taskForm.get('workTimeEstimate')?.touched"
+           class="text-danger">
+        Work time estimate is required.
+      </div>
+    </div>
+
+
+    <!-- Task Type Dropdown -->
+    <div class="mb-4">
+      <label for="taskTypeId" class="form-label large-label">Priority Type</label>
+      <select
+        id="taskTypeId"
+        class="form-control large-input"
+        formControlName="taskType"
+        required
+      >
+        <option *ngFor="let type of taskTypes" [value]="type">
+          {{ type | titlecase }}
+        </option>
+      </select>
+    </div>
+
+    <!-- fixed checkbox -->
+    <div class="mt-3 mb-2">
+      <input
+        id="fixed"
+        type="checkbox"
+        class="form-check-input"
+        formControlName="fixed"
+      />
+      <label class="form-check-label" for="fixed">
+        Set a specific time for this task
+      </label>
+    </div>
+
+    <!-- Window Dates -->
+    <div *ngIf="!taskForm.get('fixed')?.value">
+      <strong>Window</strong><br>
+      <div class="d-flex gap-4">
+        <div class="flex-grow-1">
+          <app-edit-field
+            label="Start"
+            type="date"
+            formControlName="windowStart">
+          </app-edit-field>
+          <div *ngIf="taskForm.get('windowStart')?.invalid && taskForm.get('windowStart')?.touched"
+               class="text-danger">
+            Start date is required.
+          </div>
+        </div>
+
+        <div class="flex-grow-1">
+          <app-edit-field
+            label="End"
+            type="date"
+            formControlName="windowEnd">
+          </app-edit-field>
+          <div *ngIf="taskForm.get('windowEnd')?.invalid && taskForm.get('windowEnd')?.touched"
+               class="text-danger">
+            End date is required.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned (Planned) Dates -->
+    <div *ngIf="taskForm.get('fixed')?.value">
+      <div class="d-flex align-items-center">
+        <strong>Planned</strong><br>
+      </div>
+
+      <div class="d-flex gap-4 align-items-start equal-split">
+        <div class="flex-grow-1 position-relative" (focusout)="onAssignedStartBlur()">
+
+          <app-edit-field
+            label="Planned Start"
+            [labelTooltip]="'Will be corrected to be inside Working Hours and rounded up to the next full 15 minutes.'"
+            type="datetime-local"
+            formControlName="assignedStart">
+          </app-edit-field>
+          <div *ngIf="taskForm.get('assignedStart')?.invalid && taskForm.get('assignedStart')?.touched"
+               class="text-danger">
+            Planned Start date is required.
+          </div>
+          <div class="hint-container" *ngIf="showNightShiftHint">
+            <div class="night-shift-hint fade-in">
+              <i class="bi bi-moon-stars-fill"></i>
+              Verschoben auf 06:00.
+            </div>
+          </div>
+        </div>
+
+        <div class="flex-grow-1 position-relative input-wrapper">
+          <app-edit-field
+            label="Planned End"
+            type="datetime-local"
+            formControlName="assignedEnd"
+            class="readonly-picker">
+          </app-edit-field>
+          <i class="bi bi-lock-fill lock-icon"></i>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="submitError" class="text-danger mt-4 text-center">
+      {{ submitError }}
+    </div>
+
+    <!-- Actions -->
+    <mat-dialog-actions align="end" class="task-dialog-actions mt-3">
+      <button type="button" class="optiFarm-button fab-btn" (click)="onSave()" [disabled]="isSubmitting">Create Task
+      </button>
+      <button type="button" class="optiFarm-danger-button fab-btn" (click)="onCancel()">Cancel</button>
+    </mat-dialog-actions>
+
+  </form>
+</mat-dialog-content>

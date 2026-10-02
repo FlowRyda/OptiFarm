@@ -1,0 +1,41 @@
+<h2 mat-dialog-title class="task-dialog-title">{{ task.name }}</h2>
+
+<mat-dialog-content class="task-dialog-content">
+
+  <app-info-field label="Field" [value]="task.field.name"></app-info-field>
+  <app-info-field label="Equipment" [value]="getToolNames(task.tools)"></app-info-field>
+  <app-info-field label="Categories" [value]="getCategoryNames(task.categories)"></app-info-field>
+  <app-info-field label="Working Hours" [value]="task.workTimeEstimate + 'h'"></app-info-field>
+
+  <app-info-field
+    label="Window"
+    [value]="(task.windowStart | date:'dd.MM.yyyy') + ' – ' + (task.windowEnd | date:'dd.MM.yyyy')">
+  </app-info-field>
+
+  <app-info-field
+    label="Planned"
+    [value]="getPlannedDateString()">
+  </app-info-field>
+
+  <app-info-field
+    label="Priority Type"
+    [value]="task.taskType | titlecase">
+  </app-info-field>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="task-dialog-actions">
+  <button class="optiFarm-info-button fab-btn" (click)="onEditTask(task)">Edit Task</button>
+  <button class="optiFarm-danger-button fab-btn" (click)="onDeleteTask(task)">Delete Task</button>
+</mat-dialog-actions>
+
+<app-confirmation-dialog
+  *ngIf="showDeleteConfirmation"
+  [title]="'Confirm Deletion'"
+  [message]="deletionMessage"
+  [confirmLabel]="'Yes, delete'"
+  [cancelLabel]="'Cancel'"
+  [danger]="true"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeDeleteModal()"
+></app-confirmation-dialog>

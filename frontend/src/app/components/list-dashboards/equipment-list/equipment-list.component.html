@@ -1,0 +1,18 @@
+<app-entity-list
+  [config]="config"
+  [columns]="columns"
+  [rows]="rows"
+  selectionMode="multiple"
+  (add)="onAdd()"
+  (edit)="onEdit($event)"
+  (delete)="onDelete($event)"
+  [hideMultiSelectAction]="false"
+  (multiSelectAction)="onMultiSelectAction($event)"
+  (sortChange)="onSortChange($event)"
+></app-entity-list>
+<mat-paginator
+  [length]="totalElements"
+  [pageSize]="pageSize"
+  [pageIndex]="pageIndex"
+  (page)="onMatPage($event)">
+</mat-paginator>

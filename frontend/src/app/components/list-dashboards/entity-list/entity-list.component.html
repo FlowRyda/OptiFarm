@@ -1,0 +1,71 @@
+<div class="list-root">
+  <div class="list-header">
+    <div>
+      <h5 class="list-title">{{ config.title }}</h5>
+      <h6 class="list-subtitle" *ngIf="config.subtitle">
+        {{ config.subtitle }}
+      </h6>
+    </div>
+
+    <button class="optiFarm-button" (click)="onAddClick()" [hidden]="hideAdd">
+      <span class="material-symbols-outlined btn-icon">add</span>
+      {{ config.addLabel || 'Add' }}
+    </button>
+  </div>
+
+  <div class="list-table-card">
+    <div class="list-header-row">
+      <div class="cell cell-checkbox"></div>
+
+      <div
+        class="cell header-cell"
+        *ngFor="let col of columns"
+        [class.header-cell--sortable]="col.sortable !== false && (col.field || col.sortField)"
+        (click)="onHeaderClick(col)"
+      >
+        <span>{{ col.header }}</span>
+
+        <!-- sort icons -->
+        <span class="sort-indicator" *ngIf="isColumnSortable(col)">
+          <span *ngIf="sortActive !== getSortField(col)">⇅</span>
+          <span *ngIf="sortActive === getSortField(col) && sortDirection === 'asc'">▲</span>
+          <span *ngIf="sortActive === getSortField(col) && sortDirection === 'desc'">▼</span>
+        </span>
+      </div>
+    </div>
+
+    <div
+      class="list-row"
+      *ngFor="let row of rows"
+      [class.list-row--selected]="isSelected(row)"
+      (click)="onRowClick(row)"
+    >
+      <div class="cell cell-checkbox">
+        <input
+          type="checkbox"
+          [checked]="isSelected(row)"
+          (click)="toggleRow(row, $event)"
+        />
+      </div>
+
+      <div class="cell" *ngFor="let col of columns">
+        {{ getCellValue(col, row) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="list-bottom-actions">
+    <button class="edit-btn" [disabled]="!hasSelection" (click)="onEditClick()" [hidden]="hideEdit">
+      <span class="material-symbols-outlined btn-icon">edit</span>
+      {{ config.editLabel || 'Edit' }}
+    </button>
+    <button class="delete-btn" [disabled]="!hasSelection" (click)="onDeleteClick()" [hidden]="hideDelete">
+      <span class="material-symbols-outlined btn-icon">delete</span>
+      {{ config.deleteLabel || 'Delete' }}
+    </button>
+    <button class="multi-btn" [disabled]="!hasMultiSelection" (click)="onMultiSelectClick()"
+            [hidden]="hideMultiSelectAction">
+      {{ config.multiSelectLabel || 'QR Codes' }}
+    </button>
+  </div>
+</div>

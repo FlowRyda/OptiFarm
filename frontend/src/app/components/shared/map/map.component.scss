@@ -1,0 +1,164 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+#map {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+
+:host ::ng-deep .field-marker {
+  z-index: 1000 !important;
+
+  .marker-wrapper {
+    position: relative;
+
+    svg {
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+
+    .marker-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+:host ::ng-deep .clickable-line {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:host ::ng-deep .leaflet-popup-content {
+  margin: 0;
+
+  .field-popup {
+    min-width: 200px;
+    padding: 12px;
+
+    .field-info {
+      margin-bottom: 12px;
+
+      .field-name {
+        font-size: 16px;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+        color: #333;
+      }
+
+      .field-id {
+        font-size: 13px;
+        color: #666;
+      }
+    }
+
+    .field-details-link {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #0056b3;
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
+    }
+  }
+}
+
+:host ::ng-deep .leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.2);
+}
+
+:host ::ng-deep .leaflet-interactive:focus {
+  outline: none;
+}
+
+:host ::ng-deep path.leaflet-interactive {
+  outline: none;
+}
+
+:host ::ng-deep .leaflet-container.drawing-mode,
+:host ::ng-deep .leaflet-container.drawing-mode * {
+  cursor: crosshair !important;
+}
+
+:host ::ng-deep .leaflet-container:not(.drawing-mode) {
+  cursor: grab !important;
+
+  path,
+  .leaflet-interactive {
+    cursor: pointer !important;
+  }
+}
+
+:host ::ng-deep .overlap-polygon {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+:host ::ng-deep .overlap-tooltip {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+
+  &::before {
+    border-top-color: #dc3545;
+  }
+}
+
+:host ::ng-deep .leaflet-tooltip.overlap-tooltip {
+  background-color: #dc3545;
+  border: 2px solid #fff;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  animation: pulse-tooltip 2s ease-in-out infinite;
+}
+
+@keyframes pulse-tooltip {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}

@@ -1,0 +1,330 @@
+#close-btn {
+  position: absolute;
+  margin-left: 0rem;
+  top: -2rem;
+}
+
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+}
+
+.right {
+  height: 100%;
+}
+
+.row {
+  display: flex;
+  margin: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.left {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.side-container {
+  padding: var(--side-container-padding);
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  background-color: white;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.progress-field {
+  margin-bottom: 1.5rem;
+}
+
+.progress-header {
+  margin-bottom: 0.5rem;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.progress-label {
+  font-size: 0.95rem;
+  color: inherit;
+}
+
+.progress-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #007bff;
+}
+
+.progress-display {
+  margin-top: 0.5rem;
+}
+
+.progress-bar-wrapper {
+  width: 100%;
+  height: 0.75rem;
+  background-color: #e9ecef;
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+  transition: width 0.3s ease;
+  border-radius: 0.375rem;
+}
+
+.harvest-adjustment-field {
+  margin-bottom: 1.5rem;
+
+  .adjustment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+
+    .adjustment-label {
+      font-size: 0.95rem;
+      color: inherit;
+    }
+
+    .btn-adjust {
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+      border: 1px solid #dee2e6;
+      background: white;
+      border-radius: 0.25rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+      }
+    }
+  }
+
+  .adjustment-edit {
+    .adjustment-preview {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background-color: #f8f9fa;
+      border-radius: 0.375rem;
+      border: 1px solid #dee2e6;
+
+      .original-date {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+      }
+
+      .new-date {
+        font-size: 0.95rem;
+        font-weight: 600;
+
+        &.delayed {
+          color: #dc3545;
+        }
+
+        &.earlier {
+          color: #28a745;
+        }
+
+        &.unchanged {
+          color: #6c757d;
+        }
+
+        .adjustment-info {
+          font-size: 0.85rem;
+          font-weight: 400;
+          margin-left: 0.5rem;
+
+          &.unchanged-label {
+            color: #6c757d;
+            font-style: italic;
+          }
+        }
+      }
+    }
+
+    .datepicker-section {
+      margin-bottom: 1rem;
+
+      .datepicker-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+
+      .datepicker-input {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.95rem;
+        border: 2px solid #ced4da;
+        border-radius: 0.375rem;
+        background-color: white;
+        transition: border-color 0.2s, box-shadow 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        &:hover {
+          border-color: #adb5bd;
+        }
+      }
+    }
+
+    .quick-adjust-section {
+      margin-bottom: 1rem;
+
+      .quick-adjust-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .adjustment-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+
+      .btn-day-adjust {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 2px solid #dee2e6;
+        border-radius: 0.375rem;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+
+        &.btn-decrease {
+          color: #dc3545;
+          border-color: #dc3545;
+
+          &:hover:not(:disabled) {
+            background-color: #dc3545;
+            color: white;
+          }
+        }
+
+        &.btn-increase {
+          color: #28a745;
+          border-color: #28a745;
+
+          &:hover:not(:disabled) {
+            background-color: #28a745;
+            color: white;
+          }
+        }
+
+        &:disabled {
+          opacity: 0.4;
+          cursor: not-allowed;
+          border-color: #dee2e6;
+          color: #6c757d;
+        }
+
+        &:active:not(:disabled) {
+          transform: scale(0.95);
+        }
+      }
+    }
+
+    .validation-message {
+      padding: 0.5rem 0;
+      margin-bottom: 0.75rem;
+      color: #dc3545;
+      font-size: 0.875rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        font-size: 1rem;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+
+      .btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        border-radius: 0.25rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.btn-sm {
+          padding: 0.375rem 0.875rem;
+        }
+
+        &.btn-primary {
+          background-color: #007bff;
+          color: white;
+
+          &:hover:not(:disabled) {
+            background-color: #0056b3;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+
+        &.btn-secondary {
+          background-color: #6c757d;
+          color: white;
+
+          &:hover {
+            background-color: #545b62;
+          }
+        }
+
+        &.btn-accent {
+          background-color: #ffc107;
+          color: #212529;
+
+          &:hover {
+            background-color: #e0a800;
+          }
+        }
+      }
+    }
+  }
+}
+
+.no-crop-alert {
+  text-align: center;
+  padding: 1.5rem;
+  background-color: #d1ecf1;
+  border-radius: 0.375rem;
+  color: #0c5460;
+
+  i {
+    margin-right: 0.5rem;
+    font-size: 1.25rem;
+  }
+}

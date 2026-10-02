@@ -1,0 +1,22 @@
+.modal.fade.show {
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.modal.fade {
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.custom-backdrop {
+  z-index: 1050;
+}
+
+.custom-modal {
+  z-index: 1060;
+}
+
+.modal.fade.d-block {
+  opacity: 1;
+  transition: opacity 0.2s ease-in-out;
+}

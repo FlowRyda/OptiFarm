@@ -1,0 +1,19 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="bg-secondary d-flex right">
+      <app-map [enableUserLocation]="false"
+               (markerDragged)="onMarkerDragged($event)"
+               (mapReady)="onMapReady($event)"
+      ></app-map>
+    </div>
+
+    <div class="bg-light map-action">
+      <button
+        class="btn btn-primary mt-auto"
+        (click)="submitPosition()"
+        [disabled]="sending">
+        {{ sending ? 'Sending…' : 'Use current position' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<app-map-panel-layout [enableUserLocation]="false"
+                      (mapReady)="onMapReady($event)">
+  <ng-container *ngIf="isLoading">
+    <p class="text-center page-subtitle">Loading garage...</p>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && garage && garageDetailConfig">
+    <app-panel-layout
+      [title]="garageDetailConfig.title"
+      [subtitle]="garageDetailConfig.subtitle"
+      [actionButtons]="garageDetailConfig.actionButtons"
+      [backAction]="garageDetailConfig.backAction">
+
+      <div details>
+        <app-info-field
+          *ngFor="let field of garageDetailConfig.fields"
+          [label]="field.label"
+          [value]="field.value">
+        </app-info-field>
+      </div>
+    </app-panel-layout>
+
+    <div *ngIf="garage?.tools?.length">
+      <h3 class="mt-3 mb-2">Tools in this garage</h3>
+
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let tool of garage.tools">
+          <div class="fw-semibold">
+            {{ tool.name }}
+          </div>
+          <div class="small text-muted">
+            {{ tool.categoryDto?.name }}
+            · {{ tool.remainingValue }} $
+          </div>
+          <div class="small">
+            {{ tool.description }}
+          </div>
+        </li>
+      </ul>
+    </div>
+
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && errorMessage">
+    <p class="text-danger text-center">{{ errorMessage }}</p>
+  </ng-container>
+</app-map-panel-layout>
+
+<app-confirmation-dialog
+  *ngIf="showDeleteModal"
+  [title]="'Delete garage?'"
+  [message]="'The garage will be permanently deleted.'"
+  [confirmLabel]="'Delete'"
+  [cancelLabel]="'Cancel'"
+  [danger]="true"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeDeleteModal()"
+></app-confirmation-dialog>

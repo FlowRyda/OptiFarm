@@ -1,0 +1,21 @@
+<div class="background">
+  <div *ngIf="!authService.isLoggedIn()">
+    <div class="header">
+      <h2 class="page-title">Optimize your Farm</h2>
+      <p class="page-subtitle">
+        Say goodbye to scattered spreadsheets and handwritten notes. OptiFarm transforms the way you manage your farm by
+        bringing all your data — from field records to equipment logs — into one intelligent, easy-to-use platform. With
+        real-time insights and smart decision support, OptiFarm gives you a complete overview of your operations,
+        helping you plan efficiently, boost productivity, and make data-driven decisions for a more sustainable and
+        profitable future.
+      </p>
+    </div>
+    <div class="cta">
+      <a class="signup" routerLink="/signup" routerLinkActive="active">Sign up</a>
+      <div class="or-sep"><span style="opacity:0.0">.</span>
+        <div class="or-text">OR</div>
+        <span style="opacity:0.0">.</span></div>
+      <a class="login" routerLink="/login" routerLinkActive="active">Log in</a>
+    </div>
+  </div>
+</div>

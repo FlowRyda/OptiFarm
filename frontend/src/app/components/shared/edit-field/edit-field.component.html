@@ -1,0 +1,28 @@
+<div class="edit-field">
+  <div class="d-flex align-items-center gap-2">
+    <label *ngIf="label" class="edit-field__label">
+      {{ label }}
+    </label>
+    <i *ngIf="labelTooltip"
+       class="bi bi-info-circle text-muted"
+       matTooltip="{{ labelTooltip }}"
+       matTooltipPosition="right"
+       matTooltipClass="opti-tooltip"
+    >
+    </i>
+  </div>
+  <input
+    *ngIf="!hasContent"
+    [type]="type"
+    [value]="value"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    (input)="onInputChange($event)"
+    (blur)="onBlur(); blurred.emit()"
+    class="edit-field__input"
+  />
+
+  <div *ngIf="hasContent" class="edit-field__input-container">
+    <ng-content></ng-content>
+  </div>
+</div>

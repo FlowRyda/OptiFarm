@@ -1,0 +1,95 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left col-lg-7 col-md-7 col-sm-6 col-6 d-flex flex-column">
+      <div class="row pt-2 kpi-section">
+        <div class="col-4">
+          <div class="pie-wrap">
+            <canvas id="pie-chart-croptypes"></canvas>
+            <ng-container *ngIf="isLoading">
+              <p class="text-center page-subtitle">Loading your data...</p>
+            </ng-container>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="container-kpi shadow">
+            <h4>Total earnings</h4>
+            <h6>Estimation as of the data from {{ currentYear }}</h6>
+            <h3 class="text-center mt-4">{{ totalEarnings }} $</h3>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="container-kpi shadow">
+            <h4>Difference prev. Year</h4>
+            <h6>Estimation as of the data from {{ currentYear }}</h6>
+            <h3 class="text-center mt-4"> {{ differencePrevYear | number:'1.2-2' }} %</h3>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container mt-4">
+        <canvas id="field-timeseries"></canvas>
+        <ng-container *ngIf="isLoading">
+          <p class="text-center page-subtitle">Loading your data...</p>
+        </ng-container>
+      </div>
+
+      <div class="chart-container mt-4">
+        <canvas id="scatter-chart-crops"></canvas>
+        <ng-container *ngIf="isLoading">
+          <p class="text-center page-subtitle">Loading your data...</p>
+        </ng-container>
+      </div>
+    </div>
+    <div class="side-container col-lg-5 col-md-5 col-sm-6 col-6 right d-flex flex-column">
+      <h2 class="page-title">Field {{ name }} Chart Data</h2>
+      <h6 class="page-subtitle">Acquired Data of the Field visualized</h6>
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)"
+             class="mat-elevation-z8">
+
+        <ng-container matColumnDef="position">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Position">
+            No.
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="cropType">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Crop Type">
+            Crop Type
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.cropType}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Price">
+            Price ($)
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.price}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="quantity">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Quantity">
+            Quantity (tons)
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.quantity}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="harvestDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Harvest Date">
+            Harvest Date
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.harvestDate}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator
+        [pageSize]="10"
+        showFirstLastButtons>
+      </mat-paginator>
+
+    </div>
+  </div>
+</div>

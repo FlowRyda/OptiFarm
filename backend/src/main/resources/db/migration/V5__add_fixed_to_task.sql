@@ -1,0 +1,2 @@
+ALTER TABLE IF EXISTS task
+    ADD COLUMN IF NOT EXISTS fixed boolean NOT NULL DEFAULT false;

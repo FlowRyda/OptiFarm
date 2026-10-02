@@ -1,0 +1,236 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map [enableUserLocation]="false"
+               (markerDragged)="onMarkerDragged($event)"
+               (mapClick)="onMapClicked($event)"
+               (mapReady)="onMapReady($event)"
+      ></app-map>
+    </div>
+
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+      <app-panel-layout
+        [title]="panelTitle"
+        [subtitle]="panelSubtitle"
+        [actionButtons]="actionButtons"
+        [backAction]="backAction"
+      >
+        <div *ngIf="!loading && loadError" class="text-danger text-center mb-3" details>
+          {{ loadError }}
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" details>
+          <!-- Name -->
+          <div class="mb-4">
+            <app-edit-field
+              label="Name"
+              type="text"
+              placeholder="Enter equipment name"
+              formControlName="name"
+            >
+            </app-edit-field>
+
+            <div *ngIf="form.get('name')?.invalid && form.get('name')?.touched" class="text-danger">
+              Name is required.
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-4">
+            <label for="description" class="form-label large-label">Description</label>
+            <textarea
+              id="description"
+              rows="5"
+              class="form-control large-input"
+              formControlName="description"
+              placeholder="Enter equipment description"
+              maxlength="4096"
+            >
+            </textarea>
+
+            <div *ngIf="form.get('description')?.invalid && form.get('description')?.touched" class="text-danger">
+              Description is required.
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="form-group mb-4 category-wrapper">
+            <label for="category" class="large-label">Category</label>
+            <input
+              id="category"
+              type="text"
+              placeholder="Enter or select category"
+              class="form-control large-input"
+              formControlName="category"
+              autocomplete="off"
+              (input)="onCategoryInput($event)"
+              (focus)="onCategoryFocus()"
+              (blur)="onCategoryBlur()"
+            />
+
+            <ul class="category-dropdown" *ngIf="categoryInputFocused && filteredCategories.length">
+              <li
+                *ngFor="let cat of filteredCategories"
+                (mousedown)="selectCategory(cat.name)"
+              >
+                {{ cat.name }}
+              </li>
+            </ul>
+
+            <div *ngIf="form.get('category')?.invalid && form.get('category')?.touched" class="text-danger">
+              Category is required.
+            </div>
+          </div>
+
+          <!-- Garage -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <label for="garageId" class="form-label large-label">Garage</label>
+            </div>
+
+            <select
+              id="garageId"
+              class="form-control large-input"
+              formControlName="garageId"
+              required
+            >
+              <option value="" disabled selected hidden>Select a garage</option>
+              <option *ngFor="let g of garages" [value]="g.id">
+                {{ g.name }}
+              </option>
+            </select>
+
+            <div *ngIf="form.get('garageId')?.invalid && form.get('garageId')?.touched" class="text-danger">
+              Garage is required.
+            </div>
+          </div>
+
+          <!-- Location -->
+          <div class="mb-4">
+            <app-edit-field
+              label="Location"
+              type="text"
+              placeholder="Enter Location (lat,lng)"
+              formControlName="location"
+            >
+            </app-edit-field>
+
+            <div *ngIf="form.get('location')?.invalid && form.get('location')?.touched" class="text-danger">
+              Location is required.
+            </div>
+          </div>
+
+          <!-- Remaining Value -->
+          <div class="mb-4">
+            <app-edit-field
+              label="Value"
+              type="number"
+              placeholder="Enter Value in $"
+              formControlName="remainingValue"
+            >
+            </app-edit-field>
+
+            <div *ngIf="form.get('remainingValue')?.invalid && form.get('remainingValue')?.touched" class="text-danger">
+              Value must be 0 or more.
+            </div>
+          </div>
+
+          <!-- Usable -->
+          <div class="form-check mb-4">
+            <div>
+              <input
+                id="usable"
+                type="checkbox"
+                class="form-check-input"
+                formControlName="usable"
+              />
+              <label class="form-check-label mb-0" for="usable">
+                Equipment is usable
+              </label>
+            </div>
+          </div>
+
+          <!-- Vehicle: Driven km -->
+          <div class="mb-4" *ngIf="isVehicle">
+            <app-edit-field
+              label="Driven distance"
+              type="number"
+              placeholder="Enter driven distance in km"
+              formControlName="drivenKm"
+            >
+            </app-edit-field>
+
+            <div *ngIf="form.get('drivenKm')?.invalid && form.get('drivenKm')?.touched" class="text-danger">
+              Driven distance must be 0 or more.
+            </div>
+          </div>
+
+          <!-- Vehicle: Fuel level -->
+          <div class="mb-4" *ngIf="isVehicle">
+            <app-edit-field
+              label="Fuel level"
+              type="number"
+              placeholder="Enter fuel level in %"
+              formControlName="fuelLevel"
+            >
+            </app-edit-field>
+
+            <div *ngIf="form.get('fuelLevel')?.invalid && form.get('fuelLevel')?.touched" class="text-danger">
+              Fuel level must be between 0 and 100.
+            </div>
+          </div>
+
+          <!-- Image -->
+          <div class="form-group mb-4">
+            <div class="d-flex align-items-center gap-2">
+              <label for="image" class="mb-0">Image</label>
+
+              <button
+                type="button"
+                class="secondary-optiFarm-button btn position-relative image-upload-btn"
+                (click)="fileInput.click()"
+              >
+                <span>{{ getImageUploadButtonText() }}</span>
+              </button>
+
+              <input
+                #fileInput
+                id="image"
+                name="image"
+                type="file"
+                accept="image/*"
+                (change)="onImageUpload($event)"
+                style="display: none"
+              />
+            </div>
+
+            <div *ngIf="selectedImageName" class="mt-1 text-muted small">
+              Selected: {{ selectedImageName }}
+            </div>
+
+            <div *ngIf="imagePreview" class="mt-2">
+              <img [src]="imagePreview" alt="Preview" class="tool-image-preview"/>
+            </div>
+          </div>
+
+          <!-- submit error -->
+          <div *ngIf="submitError" class="text-danger mt-4 text-center">
+            {{ submitError }}
+          </div>
+
+          <app-confirmation-dialog
+            *ngIf="showCancelDialog"
+            [title]="'Discard changes?'"
+            [message]="'All unsaved changes will be lost.'"
+            [confirmLabel]="'Discard'"
+            [cancelLabel]="'Keep editing'"
+            [danger]="true"
+            (confirmed)="confirmDiscardChanges()"
+            (cancelled)="keepEditing()"
+          ></app-confirmation-dialog>
+
+        </form>
+      </app-panel-layout>
+    </div>
+  </div>
+</div>

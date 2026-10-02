@@ -1,0 +1,52 @@
+<div class="d-flex vh-100">
+
+  <div class="d-flex col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left-side">
+    <img
+      class="image-full"
+      src="assets/cropTypeImage.png"
+      alt="Crop Type"
+    >
+  </div>
+
+  <div class="d-flex col-lg-4 col-md-5 col-sm-6 col-8 bg-light right-side">
+    <div class="mx-auto content-container">
+
+      <ng-container *ngIf="isLoading">
+        <p class="text-center page-subtitle">Loading crop type...</p>
+      </ng-container>
+
+      <ng-container *ngIf="!isLoading && cropType && detailConfig">
+        <app-panel-layout
+          [title]="detailConfig.title"
+          [subtitle]="detailConfig.subtitle"
+          [actionButtons]="detailConfig.actionButtons"
+          [backAction]="detailConfig.backAction">
+
+          <div details>
+            <app-info-field
+              *ngFor="let field of detailConfig.fields"
+              [label]="field.label"
+              [value]="field.value">
+            </app-info-field>
+          </div>
+        </app-panel-layout>
+      </ng-container>
+
+      <ng-container *ngIf="!isLoading && errorMessage">
+        <p class="text-danger text-center">{{ errorMessage }}</p>
+      </ng-container>
+
+    </div>
+  </div>
+</div>
+
+<app-confirmation-dialog
+  *ngIf="showDeleteConfirmation"
+  [title]="'Confirm Deletion'"
+  [message]="'Are you sure you want to permanently delete this crop type?'"
+  [confirmLabel]="'Yes, delete'"
+  [cancelLabel]="'Cancel'"
+  [danger]="true"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeDeleteModal()"
+></app-confirmation-dialog>

@@ -1,0 +1,25 @@
+:host {
+  display: block;
+  margin-bottom: 18px;
+}
+
+:host:last-child {
+  margin-bottom: 0;
+}
+
+.info-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-field-label {
+  font-weight: 450;
+  margin-bottom: 0.1rem;
+  font-size: 0.98rem;
+}
+
+.info-field-value {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.17rem;
+}

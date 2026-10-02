@@ -1,0 +1,19 @@
+.left-side {
+  overflow: hidden;
+}
+
+.image-full {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.right-side {
+  overflow-y: auto;
+}
+
+.content-container {
+  width: 80%;
+  max-width: 350px;
+  margin-top: 5%;
+}

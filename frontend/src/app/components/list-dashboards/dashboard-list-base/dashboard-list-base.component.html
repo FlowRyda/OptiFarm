@@ -1,0 +1,31 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-9 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <router-outlet></router-outlet>
+    </div>
+
+    <div class="side-container col-lg-3 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+
+      <h5>Select Type</h5>
+      <h6>Display the data of the selected type</h6>
+
+      <div class="accordion-section">
+        <div class="accordion-content">
+          <ul>
+            <li
+              *ngFor="let item of navItems"
+              [routerLink]="item.route"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <span class="color-dot"></span>
+              <span>{{ item.icon }}</span>
+              <span>{{ item.label }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

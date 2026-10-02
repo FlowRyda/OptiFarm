@@ -1,0 +1,120 @@
+.background {
+  background-image: url('/assets/images/home-bg.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  background-attachment: fixed;
+  width: 100%;
+  height: 96vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.header {
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 4vh;
+  font-size: 36px;
+}
+
+.page-subtitle {
+  max-width: 33%;
+  text-align: center;
+  color: #fff;
+  margin: 1rem auto;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.cta {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+
+  .signup {
+    background: #2f9e4a;
+    color: #fff;
+    padding: 18px 70px;
+    border-radius: 40px;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    width: 250px;
+    text-align: center;
+
+    &:hover {
+      background: #298a41;
+      transform: translateY(-2px);
+    }
+  }
+
+  .or-sep {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    width: 380px;
+
+    &::before,
+    &::after {
+      content: '';
+      height: 3px;
+      background: rgba(255, 255, 255, 0.35);
+      flex: 1;
+      border-radius: 2px;
+    }
+
+    .or-text {
+      font-size: 22px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 0.9);
+      padding: 6px 8px;
+    }
+  }
+
+  .login {
+    background: #ffffff;
+    color: #0b2540;
+    padding: 18px 70px;
+    border-radius: 36px;
+    border: none;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.06);
+    width: 250px;
+    text-align: center;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  @media (max-width: 800px) {
+    .signup {
+      padding: 14px 40px;
+      font-size: 18px;
+    }
+
+    .login {
+      padding: 12px 36px;
+      font-size: 16px;
+    }
+
+    .or-sep {
+      width: 260px;
+    }
+  }
+}
+
+
+

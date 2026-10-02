@@ -1,0 +1,108 @@
+<div class="d-flex vh-100">
+  <div class="d-flex col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left-side">
+    <img class="image-full"
+         src="../../../../assets/cropTypeImage.png"
+         alt="Seeds"
+    >
+  </div>
+
+  <div class="d-flex col-lg-4 col-md-5 col-sm-6 col-8 bg-light right-side">
+    <div class="mx-auto content-container">
+
+      <app-panel-layout
+        [title]="'Create New Seed'"
+        [subtitle]="'Add seed information for a crop type'"
+        [actionButtons]="[]"
+        [backAction]="backAction"
+      >
+
+        <div *ngIf="!isSubmitting && errorMessage" class="text-danger text-center mb-3" details>
+          {{ errorMessage }}
+        </div>
+
+        <form [formGroup]="seedForm" (ngSubmit)="onSubmit()" details>
+
+
+          <div class="mb-4">
+            <app-edit-field
+              label="Seed Name"
+              type="text"
+              placeholder="Enter seed name"
+              formControlName="name"
+            ></app-edit-field>
+
+            <div *ngIf="name?.invalid && name?.touched" class="text-danger">
+              Seed name is required.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <app-edit-field
+              label="Buying Price ($)"
+              type="number"
+              placeholder="Enter price in Dollar"
+              formControlName="buyingPrice"
+            ></app-edit-field>
+
+            <div *ngIf="buyingPrice?.invalid && buyingPrice?.touched" class="text-danger">
+              Price must be 0 or more.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <app-edit-field
+              label="Buying Time"
+              type="datetime-local"
+              formControlName="buyingTime"
+            ></app-edit-field>
+
+            <div *ngIf="buyingTime?.invalid && buyingTime?.touched" class="text-danger">
+              Buying time is required.
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="cropTypeId" class="form-label large-label">Crop Type</label>
+            <select
+              id="cropTypeId"
+              class="form-control large-input"
+              formControlName="cropTypeId">
+
+              <option value="" disabled>Select a crop type</option>
+              <option *ngFor="let ct of cropTypes" [value]="ct.id">
+                {{ ct.name }}
+              </option>
+            </select>
+            <div *ngIf="seedForm.get('cropTypeId')?.invalid && seedForm.get('cropTypeId')?.touched"
+                 class="text-danger error-text">
+              Crop type is required.
+            </div>
+          </div>
+
+          <div *ngIf="cropTypeId?.invalid && cropTypeId?.touched" class="text-danger">
+            Crop type is required.
+          </div>
+
+          <button
+            type="submit"
+            class="optiFarm-button w-100"
+            [disabled]="isSubmitting"
+          >
+            Create
+          </button>
+
+          <div *ngIf="successMessage" class="text-success mt-4 text-center">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="errorMessage" class="text-danger mt-4 text-center">
+            {{ errorMessage }}
+          </div>
+
+        </form>
+      </app-panel-layout>
+
+    </div>
+  </div>
+
+</div>
+

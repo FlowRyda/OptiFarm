@@ -1,0 +1,16 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map
+        [enableUserLocation]="enableUserLocation"
+        (markerDragged)="markerDragged.emit($event)"
+        (mapClick)="mapClick.emit($event)"
+        [loadFields]="false">
+      </app-map>
+    </div>
+
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>

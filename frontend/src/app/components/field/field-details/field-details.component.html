@@ -1,0 +1,207 @@
+<div class="flex-grow-1">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map [loadFields]="false"
+               (mapReady)="onMapReady($event)">
+      </app-map>
+    </div>
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+      <ng-container *ngIf="isLoading">
+        <p class="text-center page-subtitle">Loading field...</p>
+      </ng-container>
+      <ng-container *ngIf="!isLoading">
+        <app-panel-layout
+          [title]="activeField?.name || field?.name || 'Field Details'"
+          [subtitle]="'Detail View of the selected Field'"
+          [backAction]="backActionConfig"
+          [actionButtons]="actionButtonsConfig">
+
+          <div details>
+            <ng-container *ngIf="activeField; else noCrop">
+              <app-info-field
+                label="Field Name:"
+                value="{{ activeField.name || field?.name }}">
+              </app-info-field>
+
+              <app-info-field
+                label="Crop:"
+                value="{{ activeField.seedName }}">
+              </app-info-field>
+
+              <app-info-field
+                label="Planted Date:"
+                value="{{ activeField.plantedDate | date: 'd. MMMM yyyy' }} ({{ getDaysAgo(activeField.plantedDate) }} days ago)">
+              </app-info-field>
+
+              <app-info-field
+                label="Expected Harvest Date:"
+                [value]="formatExpectedHarvestDate(activeField.expectedDate)">
+              </app-info-field>
+
+              <app-info-field
+                label="Current Price:"
+                value="${{ activeField.seedPrice }}">
+              </app-info-field>
+              <app-info-field
+                label="Selling Price:"
+                value="${{ activeField.sellingPrice }}">
+              </app-info-field>
+
+              <div class="progress-field">
+                <div class="progress-header">
+                  <div class="progress-info">
+                    <span class="progress-label">Crop Progress:</span>
+                    <span class="progress-value">{{ displayProgressValue }}%</span>
+                  </div>
+                </div>
+
+                <div class="progress-display">
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-bar-fill" [style.width.%]="displayProgressValue"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="harvest-adjustment-field">
+                <div class="adjustment-header">
+                  <span class="adjustment-label">Adjust Harvest Date:</span>
+                  <button
+                    *ngIf="!isEditingHarvestDate"
+                    class="btn-adjust"
+                    (click)="startEditingHarvestDate()">
+                    Adjust
+                  </button>
+                </div>
+
+                <div *ngIf="isEditingHarvestDate" class="adjustment-edit">
+                  <div class="adjustment-preview">
+                    <div class="original-date">
+                      Original: {{ activeField.expectedDate | date: 'd. MMMM yyyy' }}
+                    </div>
+                    <div class="new-date"
+                         [class.delayed]="harvestDateAdjustment > 0"
+                         [class.earlier]="harvestDateAdjustment < 0"
+                         [class.unchanged]="harvestDateAdjustment === 0">
+                      New: {{ getAdjustedHarvestDate() | date: 'd. MMMM yyyy' }}
+                      <span class="adjustment-info" *ngIf="harvestDateAdjustment !== 0">
+                        ({{ harvestDateAdjustment > 0 ? '+' : '' }}{{ harvestDateAdjustment }} days)
+                      </span>
+                      <span class="adjustment-info unchanged-label" *ngIf="harvestDateAdjustment === 0">
+                        (no change)
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="datepicker-section">
+                    <label class="datepicker-label">Pick Date:</label>
+                    <input
+                      type="date"
+                      class="datepicker-input"
+                      [value]="getAdjustedHarvestDateString()"
+                      [min]="getMinimumHarvestDateString()"
+                      (change)="onDatePickerChange($event)">
+                  </div>
+
+                  <div class="quick-adjust-section">
+                    <label class="quick-adjust-label">Quick Adjust:</label>
+                    <div class="adjustment-buttons">
+                      <button
+                        class="btn-day-adjust btn-decrease"
+                        [disabled]="!canAdjustBy(-7)"
+                        [title]="getAdjustmentTooltip(-7)"
+                        (click)="adjustHarvestDate(-7)">
+                        -7 days
+                      </button>
+                      <button
+                        class="btn-day-adjust btn-decrease"
+                        [disabled]="!canAdjustBy(-1)"
+                        [title]="getAdjustmentTooltip(-1)"
+                        (click)="adjustHarvestDate(-1)">
+                        -1 day
+                      </button>
+                      <button
+                        class="btn-day-adjust btn-increase"
+                        [disabled]="!canAdjustBy(1)"
+                        [title]="getAdjustmentTooltip(1)"
+                        (click)="adjustHarvestDate(1)">
+                        +1 day
+                      </button>
+                      <button
+                        class="btn-day-adjust btn-increase"
+                        [disabled]="!canAdjustBy(7)"
+                        [title]="getAdjustmentTooltip(7)"
+                        (click)="adjustHarvestDate(7)">
+                        +7 days
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="validation-message" *ngIf="validationMessage">
+                    <i class="bi bi-info-circle"></i>
+                    {{ validationMessage }}
+                  </div>
+
+                  <div class="button-group">
+                    <button
+                      class="btn btn-sm btn-accent"
+                      *ngIf="harvestDateAdjustment !== 0"
+                      (click)="resetToOriginalDate()">
+                      Reset
+                    </button>
+                    <button
+                      class="btn btn-sm btn-primary"
+                      [disabled]="harvestDateAdjustment === 0"
+                      (click)="saveHarvestDateAdjustment()">
+                      Save
+                    </button>
+                    <button class="btn btn-sm btn-secondary" (click)="cancelHarvestDateEdit()">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-template #noCrop>
+              <div class="no-crop-alert">
+                <i class="bi bi-info-circle"></i>
+                No crop currently planted
+              </div>
+            </ng-template>
+          </div>
+        </app-panel-layout>
+      </ng-container>
+
+    </div>
+  </div>
+</div>
+<app-confirmation-dialog
+  *ngIf="showResetDialog"
+  title="Reset Field"
+  message="Are you sure you want to reset this field? This action cannot be undone."
+  confirmLabel="Reset"
+  cancelLabel="Cancel"
+  [danger]="true"
+  (confirmed)="onResetConfirmed()"
+  (cancelled)="onResetCancelled()">
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showHarvestDialog"
+  title="Early Harvest Confirmation"
+  message="This harvest is earlier than expected. Are you sure you want to proceed?"
+  confirmLabel="Continue"
+  cancelLabel="Cancel"
+  [danger]="false"
+  (confirmed)="onHarvestConfirmed()"
+  (cancelled)="onHarvestCancelled()">
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showDeleteDialog"
+  title="Delete Field"
+  message="Are you sure you want to delete this field? This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  [danger]="true"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()">
+</app-confirmation-dialog>

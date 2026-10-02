@@ -1,0 +1,48 @@
+<div class="d-flex vh-100">
+  <div class="d-flex col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left-side">
+    <img
+      class="image-full"
+      src="assets/cropTypeImage.png"
+      alt="Crop Type"
+    >
+  </div>
+
+  <div class="d-flex col-lg-4 col-md-5 col-sm-6 col-8 bg-light right-side">
+    <div class="mx-auto content-container">
+
+      <ng-container *ngIf="!isLoading && formConfig">
+        <app-panel-layout
+          [title]="formConfig.title"
+          [subtitle]="formConfig.subtitle"
+          [actionButtons]="formConfig.actionButtons"
+          [backAction]="formConfig.backAction">
+          <form [formGroup]="cropTypeForm" details>
+            <ng-container *ngFor="let field of formConfig.fields">
+              <div class="mb-4">
+                <app-edit-field
+                  [label]="field.label"
+                  [type]="field.type"
+                  [placeholder]="field.placeholder"
+                  [formControlName]="field.key">
+                </app-edit-field>
+
+                <div *ngIf="cropTypeForm.get(field.key)?.invalid && cropTypeForm.get(field.key)?.touched"
+                     class="text-danger error-text mt-1">
+                  {{ field.errorMessage }}
+                </div>
+              </div>
+            </ng-container>
+
+            <div *ngIf="successMessage" class="text-success mt-4 text-center info-text">
+              {{ successMessage }}
+            </div>
+            <div *ngIf="errorMessage" class="text-danger mt-4 text-center info-text">
+              {{ errorMessage }}
+            </div>
+          </form>
+        </app-panel-layout>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

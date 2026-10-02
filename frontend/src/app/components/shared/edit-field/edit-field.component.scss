@@ -1,0 +1,84 @@
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+  }
+
+  &__input,
+  &__input-container > select,
+  &__input-container > input {
+    padding: 0.625rem 0.875rem;
+    font-size: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: #ffffff;
+    color: #111827;
+    transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    &:disabled {
+      background-color: #f3f4f6;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: #9ca3af;
+    }
+
+    // style for number input
+    &[type="number"] {
+      -moz-appearance: textfield;
+
+      &::-webkit-outer-spin-button,
+      &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    }
+
+    // styles for date input
+    &[type="date"],
+    &[type="datetime-local"] {
+      &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        filter: opacity(0.5);
+
+        &:hover {
+          filter: opacity(1);
+        }
+      }
+    }
+  }
+
+  &__input-container {
+    width: 100%;
+
+    > select {
+      cursor: pointer;
+
+      option {
+        padding: 0.5rem;
+      }
+    }
+  }
+}

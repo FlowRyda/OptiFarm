@@ -1,0 +1,25 @@
+<app-map-panel-layout
+  [enableUserLocation]="true"
+  (markerDragged)="onMarkerDragged($event)"
+  (mapClick)="onMapClicked($event)"
+  (mapReady)="onMapReady($event)"
+>
+  <app-panel-layout *ngIf="formConfig"
+                    [title]="formConfig.title"
+                    [subtitle]="formConfig.subtitle"
+                    [actionButtons]="formConfig.actionButtons"
+                    [backAction]="formConfig.backAction">
+
+    <app-garage-form
+      details
+      [form]="garageForm"
+      [formConfig]="formConfig"
+      [successMessage]="successMessage"
+      [errorMessage]="errorMessage"
+      (submitForm)="onSubmit()"
+      (addressSelected)="onAddressSelected($event)"
+      (fieldChanged)="onChange()"
+    ></app-garage-form>
+
+  </app-panel-layout>
+</app-map-panel-layout>

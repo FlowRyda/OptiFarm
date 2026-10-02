@@ -1,0 +1,59 @@
+<div class="dropdown">
+  <!-- trigger -->
+  <button type="button" class="trigger" (click)="toggleOpen()">
+    <span>Pick categories/tools</span>
+    <span class="chevron">{{ isOpen ? '▲' : '▼' }}</span>
+  </button>
+
+  <!-- selected "chips" -->
+  <div class="chips" *ngIf="selected.length">
+    <span class="chip" *ngFor="let s of selected">
+      {{ s.label }}
+      <button type="button" class="chip-x" (click)="removeSelected(s.instanceId)">×</button>
+    </span>
+  </div>
+
+  <!-- panel -->
+  <div class="panel" *ngIf="isOpen">
+    <input
+      class="search"
+      type="text"
+      placeholder="Search categories or tools..."
+      [value]="query"
+      (input)="setQuery(($any($event.target).value))"
+    />
+
+    <div class="list">
+      <div *ngFor="let c of filteredCategories; trackBy: trackByCatId">
+        <div class="category" *ngIf="isVisibleCategory(c)">
+          <div class="category-row">
+            <button type="button" class="expand" (click)="toggleCategory(c.id)">
+              {{ isExpanded(c.id) ? '▾' : '▸' }}
+            </button>
+
+            <div class="category-name" (click)="toggleCategory(c.id)">
+              {{ c.name }} (Category)
+            </div>
+
+            <button type="button" class="add" [disabled]="isDisabledCategory(c)" (click)="addCategory(c)">+ Add</button>
+          </div>
+
+          <div class="tools" *ngIf="isExpanded(c.id)">
+            <div *ngFor="let t of c.tools; trackBy: trackByToolId">
+              <div class="tool-row" *ngIf="!isDisabledTool(t)">
+                <div class="tool-name">{{ t.name }}</div>
+                <button type="button" class="add" [disabled]="isDisabledTool(t)"
+                        (click)="addTool(c, t)">+ Add
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty" *ngIf="filteredCategories.length === 0">
+        No matches.
+      </div>
+    </div>
+  </div>
+</div>

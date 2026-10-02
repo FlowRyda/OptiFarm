@@ -1,0 +1,250 @@
+<div class="scheduler-root">
+
+  <aside class="left-panel">
+    <div class="left-panel-inner">
+      <h3 class="task-heading">Tasks</h3>
+
+      <div *ngIf="isLoading" class="loading-state">
+        Loading tasks...
+      </div>
+
+      <div class="task-list" *ngIf="!isLoading">
+        <div class="container">
+          <input
+            type="text"
+            class="form-control mb-3"
+            placeholder="Search tasks..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applyFilter()"
+          />
+          <div class="row g-2 mb-3">
+            <div class="col-12 col-md">
+              <label class="form-label">From</label>
+              <input
+                type="date"
+                class="form-control"
+                name="windowFrom"
+                [(ngModel)]="windowFrom"
+                (ngModelChange)="onWindowChange()"
+              />
+            </div>
+
+            <div class="col-12 col-md">
+              <label class="form-label">To</label>
+              <input
+                type="date"
+                class="form-control"
+                name="windowTo"
+                [(ngModel)]="windowTo"
+                (ngModelChange)="onWindowChange()"
+              />
+            </div>
+          </div>
+
+          <button class="btn btn-outline-secondary mb-3" type="button" (click)="clearWindow()">
+            Clear
+          </button>
+        </div>
+        <div
+          class="task-item"
+          *ngFor="let t of filteredTasks; trackBy: trackById"
+          (click)="openTaskDialog(t)"
+          style="cursor: pointer;"
+        >
+          <div class="task-title d-flex align-items-center">
+            <div *ngIf="this.currentSchedule" class="schedule-dot" [style.background]="t.color"></div>
+            <span class="text-truncate">{{ t.name }}</span>
+          </div>
+
+          <div class="task-meta"><small>
+            <ng-container *ngIf="t.field?.name">{{ t.field.name }}</ng-container>
+            <ng-container *ngIf="t.tools && t.tools.length > 0"> • {{ t.tools[0].name }}</ng-container>
+            <ng-container *ngIf="t.tools && t.tools.length > 1"> (+{{ t.tools.length - 1 }} more)</ng-container>
+          </small></div>
+
+          <div class="task-windows">
+            <div><strong>Window:</strong> {{ formatDate(t.windowStart) }} – {{ formatDate(t.windowEnd) }}</div>
+            <div><strong>Planned:</strong> {{ formatPlanned(t.assignedStart, t.assignedEnd) }}</div>
+            <div><strong>Duration:</strong> {{ t.workTimeEstimate }}h</div>
+          </div>
+        </div>
+      </div>
+      <button class="optiFarm-button add-btn" (click)="openAddTaskDialog()">Add Task</button>
+    </div>
+  </aside>
+
+  <div class="content-wrapper">
+    <div class="timeline-scroll-container">
+
+      <div class="header-row">
+        <div class="header-corner sticky-corner"></div>
+
+        <div class="header-timeline">
+          <div class="day-block" *ngFor="let day of dayDates">
+            <div class="day-label">{{ day | date:'EEE dd.MM.' }}</div>
+            <div class="hours-row">
+              <div class="hour" *ngFor="let h of hoursPerDay">
+                {{ h }}:00
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && machines.length === 0" class="no-data-message">
+        Create tasks and start the schedule to see your optimized plan.
+      </div>
+
+      <div class="body-row" *ngFor="let m of machines; trackBy: trackById">
+        <div class="machine-cell sticky-col">
+          {{ m.name }}
+        </div>
+
+        <div class="track-cell">
+          <div class="grid-background">
+            <div class="day-grid" *ngFor="let day of dayDates">
+              <div class="day-hour-cell" *ngFor="let h of hoursPerDay"></div>
+            </div>
+          </div>
+
+          <div class="task-block"
+               *ngFor="let t of getTasksForMachine(m.id); trackBy: trackById"
+               [style.left.px]="getOffsetPx(t.plannedStart)"
+               [style.width.px]="getWidthPx(t.plannedStart, t.plannedEnd)"
+               [style.background]="t.color"
+               [class.dragging]="isDragging(t)"
+               [class.invalid]="isDragging(t) && !dragValidPosition"
+               (mousedown)="onTaskMouseDown($event, t, m.id)"
+               [title]="t.name + ' - ' + t.workTimeEstimate + 'h'"
+          >
+            <div class="task-title" *ngIf="showTaskLabel(t)">{{ t.name }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="floating-actions">
+        <div class="schedule-select-wrapper position-relative">
+          <div class="form-control large-input d-flex justify-content-between align-items-center schedule-select-closed"
+               (click)="toggleScheduleDropdown()">
+            <span
+              class="text-truncate">{{ currentSchedule ? (currentSchedule.name || ('Schedule #' + currentSchedule.id)) : 'Select a schedule' }}</span>
+            <i class="bi" [ngClass]="scheduleDropdownOpen ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
+          </div>
+
+          <div *ngIf="scheduleDropdownOpen" class="schedule-dropdown shadow">
+            <div *ngIf="selectedScheduleId" class="schedule-option default-option" (click)="onScheduleSelected(null)">
+              <i class="bi bi-eraser"></i>
+              <span>Clear Schedule</span>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div *ngIf="schedules.length === 0" class="schedule-option no-schedules text-muted"
+                 style="cursor: default;">
+              <span class="flex-grow-1 text-truncate">No Schedules created yet.</span>
+            </div>
+
+            <div class="schedule-option" *ngFor="let s of schedules" (click)="onScheduleSelected(s.id)">
+              <i class="bi bi-check-circle-fill text-success me-2" *ngIf="currentSchedule?.id === s.id"></i>
+
+              <span class="flex-grow-1 text-truncate">{{ s.name || ('Schedule #' + s.id) }}</span>
+
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="onDeleteScheduleClick($event, s)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <button class="optiFarm-danger-button fab-btn"
+                (click)="openConflictModal()"
+                *ngIf="conflictedSchedulingTasks.length > 0">
+          Show Conflicts
+        </button>
+        <button class="optiFarm-warning-button fab-btn"
+                (click)="openStartScheduleModal()">
+          Start Schedule
+        </button>
+        <button class="optiFarm-info-button fab-btn"
+                (click)="rescheduleExistingSchedule()"
+                [disabled]="!currentSchedule">
+          Reschedule
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-confirmation-dialog
+  *ngIf="showSaveScheduleModal"
+  [title]="'Save Schedule'"
+  [message]="'Choose a name for the schedule:'"
+  [confirmLabel]="'Save'"
+  [cancelLabel]="'Cancel'"
+  [danger]="false"
+  (confirmed)="confirmStartSchedule()"
+  (cancelled)="closeSaveScheduleModal()">
+
+  <form [formGroup]="startScheduleForm" class="mt-3" (submit)="$event.preventDefault()">
+    <app-edit-field
+      label="Name"
+      type="text"
+      placeholder="Schedule name"
+      formControlName="name">
+    </app-edit-field>
+
+    <div *ngIf="startScheduleForm.get('name')?.invalid && startScheduleForm.get('name')?.touched"
+         class="text-danger mt-2">
+      Name is required.
+    </div>
+  </form>
+
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showDeleteScheduleConfirmation"
+  [title]="'Confirm Deletion'"
+  [message]="'Are you sure you want to permanently delete ' + (scheduleToDelete?.name || ('Schedule #' + scheduleToDelete?.id)) + '?'"
+  [confirmLabel]="'Yes, delete'"
+  [cancelLabel]="'Cancel'"
+  [danger]="true"
+  (confirmed)="confirmDeleteSchedule()"
+  (cancelled)="closeDeleteScheduleModal()"
+></app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showConflictModal"
+  [title]="'Unscheduled Tasks'"
+  [message]="null"
+  [confirmLabel]="'Reschedule'"
+  [cancelLabel]="'Cancel'"
+  [danger]="true"
+  (confirmed)="rescheduleExistingSchedule()"
+  (cancelled)="closeConflictModal()"
+  [width]="'45vw'"
+>
+  <div class="task-grid-scroll">
+    <div class="task-grid">
+      <div
+        class="task-item"
+        *ngFor="let t of conflictedSchedulingTasks; trackBy: trackById"
+        (click)="openTaskDialog(t)"
+        style="cursor: pointer;"
+      >
+        <div class="task-title d-flex align-items-center">
+          <div *ngIf="this.currentSchedule" class="schedule-dot" [style.background]="t.color"></div>
+          <span class="text-truncate">{{ t.name }}</span>
+        </div>
+
+        <div class="task-meta"><small>
+          <ng-container *ngIf="t.field?.name">{{ t.field.name }}</ng-container>
+          <ng-container *ngIf="t.tools && t.tools.length > 0"> • {{ t.tools[0].name }}</ng-container>
+          <ng-container *ngIf="t.tools && t.tools.length > 1"> (+{{ t.tools.length - 1 }} more)</ng-container>
+        </small></div>
+
+        <div class="task-windows">
+          <div><strong>Window:</strong> {{ formatDate(t.windowStart) }} – {{ formatDate(t.windowEnd) }}</div>
+          <div><strong>Planned:</strong> {{ formatPlanned(t.assignedStart, t.assignedEnd) }}</div>
+          <div><strong>Duration:</strong> {{ t.workTimeEstimate }}h</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-confirmation-dialog>

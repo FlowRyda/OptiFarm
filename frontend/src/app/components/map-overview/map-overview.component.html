@@ -1,0 +1,349 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map [fields]="fields"
+               [drawingEnabled]="false"
+               (mapReady)="onMapReady($event)">
+      </app-map>
+    </div>
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+      <div class="sidebar-content">
+        <h2 class="page-title">Farm Overview</h2>
+        <h6 class="page-subtitle">Overview over Fields and Equipment</h6>
+
+        <div class="accordion-section" [class.open]="isSectionOpen('fields')">
+          <div class="accordion-header" (click)="toggleSection('fields', $event)">
+            <h5>🟫 Fields</h5>
+            <span class="arrow" [class.open]="isSectionOpen('fields')">&#9662;</span>
+            <span class="add-btn" routerLink="/field/create">&#43;</span>
+          </div>
+
+          <div class="accordion-content" *ngIf="isSectionOpen('fields')">
+            <div class="field-heading fw-bold">
+              Empty Fields:
+            </div>
+            <div *ngIf="emptyFields.length === 0">
+              <ul class="mb-2">
+                <li>
+                <span>
+                      No empty fields.
+                </span>
+                </li>
+              </ul>
+            </div>
+
+            <ng-container *ngIf="emptyFields.length > 0">
+
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Search fields..."
+                [(ngModel)]="searchTerm.fields"
+                *ngIf="emptyFields.length > maxItemsPerSection"
+                (click)="$event.stopPropagation()"
+              />
+
+              <ul class="mb-2">
+                <li
+                  *ngFor="let field of getVisibleItems(emptyFields, 'fields')"
+                  class="field-list-item">
+          <span
+            [routerLink]="['/field/details', field.id]"
+            class="field-link"
+          >{{ field.name }}
+          </span>
+                  <button
+                    class="zoom-btn"
+                    (click)="zoomToField(field.id, $event)"
+                    title="Zoom to field">
+                    🔍
+                  </button>
+                </li>
+
+                <li *ngIf="getFilteredCount(emptyFields, 'fields') === 0">
+                  No matching fields available.
+                </li>
+
+                <li *ngIf="getFilteredCount(emptyFields, 'fields') > maxItemsPerSection" class="no-hover">
+                  Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(emptyFields, 'fields') }} fields.
+                </li>
+              </ul>
+            </ng-container>
+
+            <ng-container *ngIf="activeFields.length > 0">
+              <div class="field-heading fw-bold">
+                Active Fields:
+              </div>
+
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Search active fields..."
+                [(ngModel)]="searchTerm.activeFields"
+                *ngIf="activeFields.length > maxItemsPerSection"
+                (click)="$event.stopPropagation()"
+              />
+
+              <ul>
+                <li
+                  *ngFor="let field of getVisibleItems(activeFields, 'activeFields')"
+                  class="field-list-item"
+                  [routerLink]="['/field/details/', field.fieldId]"
+                >
+           <span class="color-dot"
+                 [ngStyle]="{
+              'background-color': 'rgba(40, 167, 69, ' + (0.1 + (field.growthStatus / 100) * 0.8)+ ')'
+            }">
+      </span>
+                  <span class="field-link">{{ field.name }}</span>
+                  <button
+                    class="zoom-btn"
+                    (click)="zoomToField(field.fieldId, $event)"
+                    title="Zoom to field">
+                    🔍
+                  </button>
+                </li>
+
+                <li *ngIf="getFilteredCount(activeFields, 'activeFields') === 0">
+                  No matching active fields available.
+                </li>
+
+                <li *ngIf="getFilteredCount(activeFields, 'activeFields') > maxItemsPerSection" class="no-hover">
+                  Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(activeFields, 'activeFields') }} active
+                  fields.
+                </li>
+              </ul>
+            </ng-container>
+
+            <div *ngIf="fields.length === 0 && activeFields.length === 0">
+              No Fields available.
+            </div>
+          </div>
+        </div>
+        <div class="accordion-section" [class.open]="isSectionOpen('cropTypes')">
+          <div class="accordion-header" (click)="toggleSection('cropTypes',  $event)">
+            <h5>🌱 Crop Types</h5>
+            <span class="arrow" [class.open]="isSectionOpen('cropTypes')">&#9662;</span>
+            <span class="add-btn" routerLink="/cropType" (click)="$event.stopPropagation()">&#43;</span>
+          </div>
+
+          <div class="accordion-content" *ngIf="isSectionOpen('cropTypes')">
+            <input
+              type="text"
+              class="form-control mb-2"
+              placeholder="Search crop types..."
+              [(ngModel)]="searchTerm.cropTypes"
+              *ngIf="cropTypes.length > maxItemsPerSection"
+              (click)="$event.stopPropagation()"
+            />
+
+            <ul>
+              <li
+                *ngFor="let crop of getVisibleItems(cropTypes, 'cropTypes')"
+                [routerLink]="['/cropType', crop.id]"
+                style="cursor: pointer;"
+              >
+                {{ crop.name }}
+              </li>
+
+              <li *ngIf="getFilteredCount(cropTypes, 'cropTypes') === 0">
+                No matching crop types available.
+              </li>
+
+              <li *ngIf="getFilteredCount(cropTypes, 'cropTypes') > maxItemsPerSection" class="no-hover">
+                Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(cropTypes, 'cropTypes') }} crop types.
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="accordion-section" [class.open]="isSectionOpen('seeds')">
+          <div class="accordion-header" (click)="toggleSection('seeds',  $event)">
+            <h5>🫘 Seeds</h5>
+            <span class="arrow" [class.open]="isSectionOpen('seeds')">&#9662;</span>
+            <span class="add-btn" routerLink="/seed" (click)="$event.stopPropagation()">&#43;</span>
+          </div>
+
+          <div class="accordion-content" *ngIf="isSectionOpen('seeds')">
+            <input
+              type="text"
+              class="form-control mb-2"
+              placeholder="Search seeds..."
+              [(ngModel)]="searchTerm.seeds"
+              *ngIf="seeds.length > maxItemsPerSection"
+              (click)="$event.stopPropagation()"
+            />
+
+            <ul>
+              <li
+                *ngFor="let seed of getVisibleItems(seeds, 'seeds')"
+                [routerLink]="['/seed', seed.id]"
+                style="cursor: pointer;"
+              >
+                {{ seed.name }}
+              </li>
+
+              <li *ngIf="getFilteredCount(seeds, 'seeds') === 0">
+                No matching seeds available.
+              </li>
+
+              <li *ngIf="getFilteredCount(seeds, 'seeds') > maxItemsPerSection" class="no-hover">
+                Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(seeds, 'seeds') }} seeds.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="accordion-section" [class.open]="isSectionOpen('equipment')">
+          <div class="accordion-header" (click)="toggleSection('equipment',  $event)">
+            <h5>🛠 Equipment</h5>
+            <span class="arrow" [class.open]="isSectionOpen('equipment')">&#9662;</span>
+            <span class="add-btn" routerLink="/equipment/create" (click)="$event.stopPropagation()">&#43;</span>
+          </div>
+
+          <div class="accordion-content" *ngIf="isSectionOpen('equipment')">
+            <!-- Vehicles -->
+            <ng-container *ngIf="vehicles.length > 0">
+              <div class="vehicle-heading fw-bold">
+                Vehicles:
+              </div>
+
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Search vehicles..."
+                [(ngModel)]="searchTerm.vehicles"
+                *ngIf="vehicles.length > maxItemsPerSection"
+                (click)="$event.stopPropagation()"
+              />
+
+              <ul class="mb-2">
+                <li
+                  *ngFor="let vehicle of getVisibleItems(vehicles, 'vehicles')"
+                  class="tool-item"
+                  [routerLink]="['/vehicle/detail', vehicle.id]"
+                  (click)="$event.stopPropagation()"
+                >
+            <span
+              class="color-dot"
+              [ngClass]="vehicle.usable ? 'green' : 'red'">
+            </span>
+                  <span class="tool-name">
+              {{ vehicle.name }}
+            </span>
+                  <button class="zoom-btn"
+                          (click)="zoomToEquipment(vehicle.id, 'vehicle', $event)"
+                          title="Zoom to vehicle">
+                    🔍
+                  </button>
+                </li>
+
+                <li *ngIf="getFilteredCount(vehicles, 'vehicles') === 0">
+                  No matching vehicles available.
+                </li>
+
+                <li *ngIf="getFilteredCount(vehicles, 'vehicles') > maxItemsPerSection" class="no-hover">
+                  Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(vehicles, 'vehicles') }} vehicles.
+                </li>
+              </ul>
+            </ng-container>
+
+            <!-- Tools -->
+            <ng-container *ngIf="tools.length > 0">
+              <div class="equipment-heading fw-bold">
+                Equipment:
+              </div>
+
+              <input
+                type="text"
+                class="form-control mb-2"
+                placeholder="Search equipment..."
+                [(ngModel)]="searchTerm.tools"
+                *ngIf="tools.length > maxItemsPerSection"
+                (click)="$event.stopPropagation()"
+              />
+
+              <ul>
+                <li
+                  *ngFor="let tool of getVisibleItems(tools, 'tools')"
+                  class="tool-item"
+                  [routerLink]="['/equipment/detail', tool.id]"
+                  (click)="$event.stopPropagation()"
+                >
+            <span
+              class="color-dot"
+              [ngClass]="tool.usable ? 'green' : 'red'">
+            </span>
+                  <span class="tool-name">
+              {{ tool.name }}
+            </span>
+                  <button class="zoom-btn"
+                          (click)="zoomToEquipment(tool.id, 'tool', $event)"
+                          title="Zoom to equipment">
+                    🔍
+                  </button>
+                </li>
+
+                <li *ngIf="getFilteredCount(tools, 'tools') === 0">
+                  No matching equipment available.
+                </li>
+
+                <li *ngIf="getFilteredCount(tools, 'tools') > maxItemsPerSection" class="no-hover">
+                  Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(tools, 'tools') }} equipment items.
+                </li>
+              </ul>
+            </ng-container>
+
+            <div *ngIf="vehicles.length === 0 && tools.length === 0">
+              No Equipment or Vehicles available.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-section" [class.open]="isSectionOpen('garage')">
+          <div class="accordion-header" (click)="toggleSection('garage',  $event)">
+            <h5>🏠 Garage</h5>
+            <span class="arrow" [class.open]="isSectionOpen('garage')">&#9662;</span>
+            <span class="add-btn" [routerLink]="['/garage']">&#43;</span>
+          </div>
+
+
+          <div class="accordion-content" *ngIf="isSectionOpen('garage')">
+            <input
+              type="text"
+              class="form-control mb-2"
+              placeholder="Search garages..."
+              [(ngModel)]="searchTerm.garages"
+              *ngIf="garages.length > maxItemsPerSection"
+              (click)="$event.stopPropagation()"
+            />
+
+            <ul>
+              <li
+                *ngFor="let garage of getVisibleItems(garages, 'garages')"
+                class="field-list-item"
+                [routerLink]="['/garage/details', garage.id]">
+                <span class="field-link">{{ garage.name }}</span>
+                <button class="zoom-btn"
+                        (click)="zoomToGarage(garage.id, $event)"
+                        title="Zoom to garage">
+                  🔍
+                </button>
+              </li>
+
+              <li *ngIf="getFilteredCount(garages, 'garages') === 0">
+                No matching garages available.
+              </li>
+
+              <li *ngIf="getFilteredCount(garages, 'garages') > maxItemsPerSection" class="no-hover">
+                Showing first {{ maxItemsPerSection }} of {{ getFilteredCount(garages, 'garages') }} garages.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

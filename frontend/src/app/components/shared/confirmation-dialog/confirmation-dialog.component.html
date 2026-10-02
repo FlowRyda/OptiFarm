@@ -1,0 +1,52 @@
+<ng-container>
+  <div class="modal-backdrop fade show custom-backdrop" (click)="onBackdropClick()"></div>
+
+  <div
+    class="modal fade d-block custom-modal"
+    tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    (click)="onBackdropClick()"
+  >
+    <div
+      class="modal-dialog modal-dialog-centered"
+      role="document"
+      [style.max-width]="width"
+      (click)="stopPropagation($event)"
+    >
+      <div class="modal-content border-0 shadow-lg rounded-3">
+        <div
+          class="modal-header text-white rounded-top-3"
+          [ngClass]="danger ? 'bg-danger' : 'bg-primary'"
+        >
+          <h5 class="modal-title">{{ title }}</h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            aria-label="Close"
+            (click)="onCancelClick($event)"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <p *ngIf="message">{{ message }}</p>
+          <ng-content></ng-content>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCancelClick($event)">
+            {{ cancelLabel }}
+          </button>
+          <button
+            type="button"
+            class="btn"
+            [ngClass]="danger ? 'btn-danger' : 'btn-primary'"
+            (click)="onConfirmClick($event)"
+          >
+            {{ confirmLabel }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

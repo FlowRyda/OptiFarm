@@ -1,0 +1,51 @@
+<div class="flex-grow-1">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-5 col-sm-4 bg-secondary d-flex flex-column">
+      <img src="assets/images/farming.png" alt="farming background">
+    </div>
+    <div class="side-container col-lg-4 col-md-7 col-sm-8 bg-light right d-flex flex-column">
+      <app-panel-layout *ngIf="formConfig"
+                        [title]="formConfig.title"
+                        [subtitle]="formConfig.subtitle"
+                        [actionButtons]="formConfig.actionButtons"
+                        [backAction]="formConfig.backAction">
+
+        <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" details>
+
+          <ng-container>
+            <div class="mb-4" *ngFor="let field of formConfig.fields">
+
+
+              <app-edit-field
+                [label]="field.label"
+                [type]="field.type"
+                [placeholder]="field.placeholder"
+                [formControlName]="field.key"
+              >
+              </app-edit-field>
+
+              <div *ngIf="signupForm.get(field.key)?.invalid && signupForm.get(field.key)?.touched"
+                   class="text-danger">
+                {{ field.errorMessage }}
+              </div>
+            </div>
+          </ng-container>
+
+          <div *ngIf="successMessage" class="text-success mt-4 text-center">
+            {{ successMessage }}
+          </div>
+          <div *ngIf="errorMessage" class="text-danger mt-4 text-center">
+            {{ errorMessage }}
+          </div>
+          <p class="mt-3">
+            Already have an account?
+            <a routerLink="/login">Log in</a>
+          </p>
+        </form>
+      </app-panel-layout>
+
+
+    </div>
+  </div>
+</div>
+

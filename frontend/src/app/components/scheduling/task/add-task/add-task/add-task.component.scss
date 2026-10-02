@@ -1,0 +1,176 @@
+.task-dialog-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #2b2b2b;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #eee;
+}
+
+::ng-deep .mat-dialog-container {
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 100%;
+  background-color: #ffffff;
+  font-family: 'Roboto', sans-serif;
+  color: #333;
+  overflow: hidden;
+}
+
+.task-dialog-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.task-dialog-content p {
+  margin: 8px 0;
+}
+
+.task-dialog-content strong {
+  color: #444;
+}
+
+::ng-deep .task-dialog-actions.mat-mdc-dialog-actions {
+  padding-top: 0 !important; /* remove upper 16px */
+  margin-bottom: 0 !important;
+  min-height: auto;
+}
+
+.task-dialog-actions {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+  padding-bottom: 16px;
+}
+
+.task-dialog-actions button {
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-weight: 500;
+  font-size: 1rem;
+  transition: background-color 0.2s;
+  min-width: 150px;
+}
+
+/* Specific buttons */
+.optiFarm-info-button {
+  background-color: #2196F3;
+  color: #fff;
+}
+
+.optiFarm-info-button:hover {
+  background-color: #1976D2;
+}
+
+.optiFarm-danger-button {
+  background-color: #8D2929;
+  color: #fff;
+}
+
+.optiFarm-danger-button:hover {
+  background-color: #d32f2f;
+}
+
+.large-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.75rem !important;
+}
+
+.large-input {
+  padding: 0.625rem 0.875rem;
+  font-size: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background-color: #ffffff;
+  color: #111827;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+}
+
+.large-input:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+select.large-input:required:invalid {
+  color: #9ca3af !important;
+  font-style: italic;
+}
+
+select.large-input option[disabled][value=""] {
+  color: #9ca3af !important;
+  font-style: italic;
+}
+
+select.large-input option:not([disabled]) {
+  color: #111827;
+  font-style: normal;
+}
+
+select:disabled {
+  background-color: #e9ecef;
+  color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.form-label {
+  &.disabled-label {
+    color: #6c757d;
+    opacity: 0.6;
+  }
+}
+
+::ng-deep .readonly-picker input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: none; /* Chrome/Edge/Opera */
+  -webkit-appearance: none;
+}
+
+.hint-container {
+  min-height: 30px;
+  margin-top: 2px;
+}
+
+.night-shift-hint {
+  font-size: 0.8rem;
+  color: #856404;
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.lock-icon {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  font-size: 1.2rem;
+  color: #6c757d;
+  pointer-events: none;
+  z-index: 10;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.equal-split > div {
+  flex-basis: 0;
+  min-width: 0;
+}
+
+.form-check-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  margin-left: 0.25rem;
+}

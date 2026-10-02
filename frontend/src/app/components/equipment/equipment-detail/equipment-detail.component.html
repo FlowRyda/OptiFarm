@@ -1,0 +1,59 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map [loadFields]="false"
+               (mapReady)="onMapReady($event)">
+      </app-map>
+    </div>
+
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+      <app-panel-layout
+        [title]="detailConfig?.title || (isVehicle ? 'Vehicle Detail' : 'Equipment Detail')"
+        [subtitle]="detailConfig?.subtitle || ''"
+        [actionButtons]="detailConfig?.actionButtons || []"
+        [backAction]="detailConfig?.backAction || backAction"
+      >
+        <!-- Loading state -->
+        <div *ngIf="loading" class="text-center page-subtitle" details>
+          Loading {{ isVehicle ? 'vehicle' : 'equipment' }}...
+        </div>
+
+        <!-- Error state -->
+        <div *ngIf="!loading && error" class="text-danger text-center mb-3" details>
+          {{ error }}
+        </div>
+
+        <!-- Detail content -->
+        <div *ngIf="!loading && !error && detailConfig as cfg" details>
+          <div class="detail-image-wrapper" *ngIf="tool?.image">
+            <img
+              [src]="'data:image/*;base64,' + tool.image"
+              alt="Image"
+              class="detail-image"
+            />
+          </div>
+
+          <div class="mb-3">
+            <app-info-field
+              *ngFor="let field of cfg.fields"
+              [label]="field.label"
+              [value]="field.value"
+            ></app-info-field>
+          </div>
+        </div>
+      </app-panel-layout>
+
+      <app-confirmation-dialog
+        *ngIf="showDeleteConfirmation"
+        [title]="'Confirm Deletion'"
+        [message]="'Are you sure you want to permanently delete this ' + (isVehicle ? 'vehicle' : 'equipment') + '?'"
+        [confirmLabel]="'Yes, delete'"
+        [cancelLabel]="'Cancel'"
+        [danger]="true"
+        (confirmed)="confirmDelete()"
+        (cancelled)="closeDeleteModal()"
+      ></app-confirmation-dialog>
+
+    </div>
+  </div>
+</div>

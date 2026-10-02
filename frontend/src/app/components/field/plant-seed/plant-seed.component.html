@@ -1,0 +1,116 @@
+<div class="flex-grow-1">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map [loadFields]="false"
+               (mapReady)="onMapReady($event)">
+      </app-map>
+    </div>
+
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+
+      <app-panel-layout
+        [title]="'Plant Seed'"
+        [subtitle]="'Plant seed on ' + field?.name"
+        [backAction]="backActionConfig"
+        [actionButtons]="actionButtonsConfig">
+        <div details>
+
+          <!-- Validation errors alert box -->
+          <div *ngIf="validationErrors.length > 0" class="alert alert-danger alert-dismissible fade show mb-3"
+               role="alert">
+            <div class="alert-header">
+              <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+              <button type="button" class="btn-close" (click)="clearValidationErrors()"></button>
+            </div>
+            <div class="alert-body">
+              <strong>Please fix the following {{ validationErrors.length === 1 ? 'issue' : 'issues' }}:</strong>
+              <ul class="mb-0 mt-2">
+                <li *ngFor="let error of validationErrors">{{ error }}</li>
+              </ul>
+            </div>
+          </div>
+
+          <form [formGroup]="plantSeedForm" (ngSubmit)="onSubmit()">
+            <div class="mb-4">
+              <label for="cropTypeId" class="form-label">Seed</label>
+              <select
+                id="cropTypeId"
+                class="form-control optiFarm-inputField"
+                formControlName="cropTypeId">
+
+                <option value="" disabled selected>Select a seed</option>
+                <option *ngFor="let ct of seeds" [value]="ct.id">
+                  {{ ct.name }}
+                </option>
+              </select>
+
+              <small *ngIf="cropTypeId?.value" class="text-muted d-block mt-1">
+                <i class="bi bi-clock"></i> Growth duration: {{ getSelectedSeedGrowthDuration() }} days
+              </small>
+
+              <div *ngIf="cropTypeId?.invalid && cropTypeId?.touched" class="text-danger">
+                Seed is required.
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <app-edit-field
+                type="datetime-local"
+                formControlName="plantDate"
+                label="Plant Date"
+              ></app-edit-field>
+
+              <div *ngIf="plantDate?.invalid && plantDate?.touched" class="text-danger">
+                Plant date is required.
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <app-edit-field
+                type="datetime-local"
+                formControlName="expectedHarvestDate"
+                label="Expected Harvest Date (Optional)"
+              ></app-edit-field>
+            </div>
+
+            <div class="mb-4">
+
+              <app-edit-field
+                type="number"
+                id="sellingPrice"
+                placeholder="20.00"
+                formControlName="sellingPrice"
+                label="Selling Price ($)"
+              >
+              </app-edit-field>
+
+              <div *ngIf="sellingPrice?.invalid && sellingPrice?.touched" class="text-danger">
+                Price must be 0 or more.
+              </div>
+            </div>
+
+            <div *ngIf="successMessage" class="text-success mt-4 text-center">
+              {{ successMessage }}
+            </div>
+            <div *ngIf="errorMessage" class="text-danger mt-4 text-center">
+              {{ errorMessage }}
+            </div>
+          </form>
+        </div>
+
+      </app-panel-layout>
+
+    </div>
+  </div>
+</div>
+
+<app-confirmation-dialog
+  *ngIf="showCancelDialog"
+  [title]="'Discard changes?'"
+  [message]="'All unsaved changes will be lost.'"
+  [confirmLabel]="'Discard'"
+  [cancelLabel]="'Keep editing'"
+  [danger]="true"
+  (confirmed)="confirmDiscardChanges()"
+  (cancelled)="keepEditing()"
+></app-confirmation-dialog>

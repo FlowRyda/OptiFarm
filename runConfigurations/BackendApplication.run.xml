@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+    <option name="ACTIVE_PROFILES" value="dev" />
+    <option name="ALTERNATIVE_JRE_PATH" value="ms-21" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <module name="backend" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="at.ac.tuwien.ase.groupphase.backend.BackendApplication" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="at.ac.tuwien.ase.groupphase.backend.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

@@ -1,0 +1,336 @@
+<div class="flex-grow-1">
+  <div class="row h-100">
+    <div class="left p-0 col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left d-flex flex-column">
+      <app-map
+        [drawingEnabled]="shouldEnableDrawing"
+        [loadFields]="true"
+        [excludeFieldId]="fieldId"
+        (mapReady)="onMapReady($event)">
+
+      </app-map>
+    </div>
+
+    <div class="side-container col-lg-4 col-md-5 col-sm-6 col-8 bg-light right d-flex flex-column">
+
+      <div *ngIf="isLoading" class="text-center p-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading field...</p>
+      </div>
+
+      <app-panel-layout
+        *ngIf="!isLoading"
+        [title]="pageTitle"
+        [subtitle]="pageSubtitle"
+        [backAction]="backActionConfig"
+        [actionButtons]="actionButtons">
+
+        <div details>
+          <div *ngIf="globalErrorMessage" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+            <div class="alert-header">
+              <i class="bi bi-exclamation-triangle-fill alert-icon"></i>
+              <button type="button" class="btn-close"
+                      (click)="globalErrorMessage = null; clearOverlapVisualization()"></button>
+            </div>
+            <div class="alert-body">
+              {{ globalErrorMessage }}
+              <div *ngIf="overlappingFieldName" class="mt-2 small text-muted">
+                The red area shows the overlap. Adjust your boundaries to continue.
+              </div>
+            </div>
+          </div>
+
+
+          <form [formGroup]="createEditForm">
+
+            <div class="form-group mb-3">
+              <label for="fieldName" class="form-label">Field Name</label>
+              <input
+                type="text"
+                id="fieldName"
+                class="form-control"
+                formControlName="name"
+                [placeholder]="mode === 'create' ? 'Enter field name' : 'Enter new field name'"
+                [class.is-invalid]="nameError">
+              <div *ngIf="nameError" class="invalid-feedback d-block">
+                {{ nameError }}
+              </div>
+            </div>
+
+            <!-- PHASE 1: Drawing Outer Boundary -->
+            <div *ngIf="editPhase === 'outer'" class="instructions-box mb-3">
+              <div class="instructions-title">📍 Step 1: Mark your field boundary</div>
+
+              <!-- Collapsible Keyboard Shortcuts -->
+              <div class="keyboard-shortcuts-toggle mt-2">
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm p-0 text-decoration-none text-muted"
+                  (click)="showOuterShortcuts = !showOuterShortcuts">
+                  <i class="bi" [ngClass]="showOuterShortcuts ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  ⌨️ Keyboard shortcuts
+                </button>
+                <div *ngIf="showOuterShortcuts" class="shortcuts-content mt-2 p-2 bg-light border rounded">
+                  <small class="text-muted d-block">
+                    <kbd>Space</kbd>/<kbd>Enter</kbd> Done &nbsp;|&nbsp;
+                    <kbd>Backspace</kbd> Undo last &nbsp;|&nbsp;
+                    <kbd>C</kbd> Clear all &nbsp;|&nbsp;
+                    <kbd>Esc</kbd> Cancel
+                  </small>
+                </div>
+              </div>
+
+              <ul class="instructions-list mt-2">
+                <li><strong>Click corners</strong> on the map to add points (minimum 3)</li>
+                <li><strong>Click on a line</strong> to insert a point between two corners</li>
+                <li><strong>Drag markers</strong> to adjust positions</li>
+                <li><strong>Right-click marker</strong> to remove it</li>
+              </ul>
+
+              <div *ngIf="markerCount > 0" class="marker-count mt-2">
+                <strong>{{ markerCount }}</strong> point{{ markerCount !== 1 ? 's' : '' }} marked
+                <span *ngIf="markerCount < 3" class="text-warning d-block">
+        Need {{ 3 - markerCount }} more for valid boundary
+      </span>
+                <span *ngIf="markerCount >= 3" class="text-success d-block">
+        ✓ Minimum points met
+      </span>
+              </div>
+
+              <div *ngIf="boundariesError" class="text-danger mt-2">
+                <small>{{ boundariesError }}</small>
+              </div>
+
+              <!-- Done Button -->
+              <div class="boundary-actions d-flex gap-2 mt-3">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  [disabled]="markerCount < 3"
+                  (click)="lockOuterBoundary()">
+                  Done <small class="ms-1 opacity-75">(Space)</small>
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="onCancelOuterDrawing()">
+                  Cancel <small class="opacity-75">(Esc)</small>
+                </button>
+
+                <button
+                  *ngIf="canClearBoundary"
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="onClearBoundary()">
+                  Clear Points
+                </button>
+              </div>
+            </div>
+
+            <!-- PHASE 2: Management View - Only show when boundary is locked -->
+            <div *ngIf="editPhase === 'exclusion' && currentExclusionIndex === -1 && isInManagementView"
+                 class="exclusion-management mb-3">
+              <div class="alert alert-success d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <i class="bi bi-check-circle-fill me-2"></i>
+                  <strong>Outer boundary locked</strong>
+                  <span class="text-muted ms-2">({{ lockedOuterBoundary?.length || 0 }} points)</span>
+                </div>
+                <div class="btn-group btn-group-sm">
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="zoomToField()"
+                    title="Zoom to field">
+                    <i class="bi bi-zoom-in"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    (click)="unlockOuter()"
+                    title="Edit boundary">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Exclusion zones info -->
+              <div class="instructions-box mb-3">
+                <div class="instructions-title">🚫 Step 2: Add exclusion zones (optional)</div>
+
+                <!-- Collapsible Keyboard Shortcuts -->
+                <div class="keyboard-shortcuts-toggle mt-2">
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm p-0 text-decoration-none text-muted"
+                    (click)="showManagementShortcuts = !showManagementShortcuts">
+                    <i class="bi" [ngClass]="showManagementShortcuts ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    ⌨️ Keyboard shortcuts
+                  </button>
+                  <div *ngIf="showManagementShortcuts" class="shortcuts-content mt-2 p-2 bg-light border rounded">
+                    <small class="text-muted d-block">
+                      <kbd>Space</kbd> Add exclusion zone &nbsp;|&nbsp;
+                      <kbd>Click polygon</kbd> Edit or delete
+                    </small>
+                  </div>
+                </div>
+
+                <p class="text-muted small mb-2 mt-2">
+                  Exclusion zones are areas within your field that should not be included
+                  (e.g., buildings, ponds, trees).
+                </p>
+
+                <!-- List existing exclusions -->
+                <div *ngIf="exclusions.length > 0" class="exclusions-list mb-3">
+                  <div *ngFor="let exclusion of exclusions; let i = index"
+                       class="exclusion-item d-flex justify-content-between align-items-center mb-2 p-2 border rounded bg-white">
+                    <div class="small">
+                      <strong>Exclusion {{ i + 1 }}</strong>
+                      <span class="text-muted ms-2">({{ exclusion.length }} pts)</span>
+                    </div>
+                    <div class="btn-group btn-group-sm">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        (click)="editExclusion(i)"
+                        title="Edit exclusion">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="deleteExclusion(i)"
+                        title="Delete exclusion">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="exclusions.length === 0" class="text-muted small mb-3">
+                  No exclusion zones added yet.
+                </div>
+              </div>
+
+              <!-- Add new exclusion button -->
+              <div class="boundary-actions d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="addNewExclusion()">
+                  <i class="bi bi-plus-circle me-1"></i>Add Exclusion Zone <small
+                  class="ms-1 opacity-75">(Space)</small>
+                </button>
+              </div>
+            </div>
+
+            <!-- PHASE 3: Drawing an Exclusion -->
+            <div *ngIf="editPhase === 'exclusion' && currentExclusionIndex >= 0" class="instructions-box mb-3">
+              <div class="instructions-title text-danger">
+                🚫 Drawing Exclusion Zone {{ currentExclusionIndex + 1 }}
+              </div>
+
+              <!-- Collapsible Keyboard Shortcuts -->
+              <div class="keyboard-shortcuts-toggle mt-2">
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm p-0 text-decoration-none text-muted"
+                  (click)="showExclusionShortcuts = !showExclusionShortcuts">
+                  <i class="bi" [ngClass]="showExclusionShortcuts ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                  ⌨️ Keyboard shortcuts
+                </button>
+                <div *ngIf="showExclusionShortcuts" class="shortcuts-content mt-2 p-2 bg-light border rounded">
+                  <small class="text-muted d-block">
+                    <kbd>Space</kbd>/<kbd>Enter</kbd> Done &nbsp;|&nbsp;
+                    <kbd>Backspace</kbd> Undo last &nbsp;|&nbsp;
+                    <kbd>C</kbd> Clear all &nbsp;|&nbsp;
+                    <kbd>Esc</kbd> Cancel
+                  </small>
+                </div>
+              </div>
+
+              <ul class="instructions-list mt-2">
+                <li><strong>Click corners</strong> to mark the exclusion area (minimum 3)</li>
+                <li><strong>Drag red markers</strong> to adjust positions</li>
+                <li><strong>Right-click marker</strong> to remove it</li>
+              </ul>
+
+              <div *ngIf="markerCount > 0" class="marker-count mt-2">
+                <strong>{{ markerCount }}</strong> point{{ markerCount !== 1 ? 's' : '' }} marked
+                <span *ngIf="markerCount < 3" class="text-warning d-block">
+        Need {{ 3 - markerCount }} more for valid exclusion
+      </span>
+                <span *ngIf="markerCount >= 3" class="text-success d-block">
+        ✓ Minimum points met
+      </span>
+              </div>
+
+              <!-- Done Button -->
+              <div class="boundary-actions d-flex gap-2 mt-3">
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  [disabled]="markerCount < 3"
+                  (click)="lockExclusion()">
+                  <i class="bi bi-check-fill me-1"></i>Done <small class="ms-1 opacity-75">(Space)</small>
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="cancelExclusionDrawing()">
+                  Cancel <small class="opacity-75">(Esc)</small>
+                </button>
+
+                <button
+                  *ngIf="canClearBoundary"
+                  type="button"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="onClearBoundary()">
+                  Clear Points
+                </button>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+      </app-panel-layout>
+
+    </div>
+  </div>
+</div>
+<app-confirmation-dialog
+  *ngIf="showDeleteDialog"
+  title="Delete Field"
+  message="Are you sure you want to delete this field? This action cannot be undone."
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  [danger]="true"
+  (confirmed)="onDeleteConfirmed()"
+  (cancelled)="onDeleteCancelled()">
+</app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showCancelDialog"
+  [title]="'Discard changes?'"
+  [message]="'All unsaved changes will be lost.'"
+  [confirmLabel]="'Discard'"
+  [cancelLabel]="'Keep editing'"
+  [danger]="true"
+  (confirmed)="confirmDiscardChanges()"
+  (cancelled)="keepEditing()"
+></app-confirmation-dialog>
+
+<app-confirmation-dialog
+  *ngIf="showUnsavedDrawingDialog"
+  [title]="'Unsaved Drawing Work'"
+  [message]="'You have an unlocked boundary or exclusion zone that hasn\'t been finalized. If you leave now, this drawing work will be lost.'"
+  [confirmLabel]="'Discard & Leave'"
+  [cancelLabel]="'Continue Drawing'"
+  [danger]="true"
+  (confirmed)="onUnsavedDrawingConfirmed()"
+  (cancelled)="onUnsavedDrawingCancelled()"
+></app-confirmation-dialog>

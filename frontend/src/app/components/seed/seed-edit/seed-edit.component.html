@@ -1,0 +1,79 @@
+<div class="d-flex h-100 w-100">
+  <div class="d-flex col-lg-8 col-md-7 col-sm-6 col-4 bg-secondary left-side">
+    <img class="image-full" src="../../../../assets/cropTypeImage.png" alt="Seed">
+  </div>
+
+  <div class="d-flex col-lg-4 col-md-5 col-sm-6 col-8 bg-light right-side">
+    <div class="mx-auto content-container">
+
+      <ng-container *ngIf="isLoading">
+        <p class="text-center page-subtitle">Loading seed details...</p>
+      </ng-container>
+
+      <ng-container *ngIf="!isLoading && formConfig">
+        <app-panel-layout
+          [title]="formConfig.title"
+          [subtitle]="formConfig.subtitle"
+          [actionButtons]="formConfig.actionButtons"
+          [backAction]="formConfig.backAction">
+
+          <form [formGroup]="seedForm" details>
+            <ng-container *ngFor="let field of formConfig.fields">
+              <div class="mb-4">
+
+                <ng-container *ngIf="field.type !== 'select'">
+                  <app-edit-field
+                    [label]="field.label"
+                    [type]="field.type"
+                    [placeholder]="field.placeholder"
+                    [formControlName]="field.key">
+                  </app-edit-field>
+                </ng-container>
+
+                <ng-container *ngIf="field.type === 'select'">
+                  <div class="mb-4">
+                    <label for="cropTypeId" class="form-label large-label">Crop Type</label>
+                    <select
+                      id="cropTypeId"
+                      class="form-control large-input"
+                      formControlName="cropTypeId">
+
+                      <option value="" disabled>Select a crop type</option>
+                      <option *ngFor="let ct of cropTypes" [value]="ct.id">
+                        {{ ct.name }}
+                      </option>
+                    </select>
+                    <div *ngIf="seedForm.get('cropTypeId')?.invalid && seedForm.get('cropTypeId')?.touched"
+                         class="text-danger error-text">
+                      Crop type is required.
+                    </div>
+                  </div>
+                </ng-container>
+
+                <!-- Validation messages -->
+                <div *ngIf="seedForm.get(field.key)?.invalid && seedForm.get(field.key)?.touched"
+                     class="text-danger error-text mt-1">
+                  {{ field.errorMessage }}
+                </div>
+
+              </div>
+            </ng-container>
+
+            <div *ngIf="successMessage" class="text-success mt-4 text-center info-text">
+              {{ successMessage }}
+            </div>
+            <div *ngIf="errorMessage" class="text-danger mt-4 text-center info-text">
+              {{ errorMessage }}
+            </div>
+          </form>
+
+        </app-panel-layout>
+      </ng-container>
+
+      <ng-container *ngIf="!isLoading && errorMessage && !formConfig">
+        <p class="text-danger text-center">{{ errorMessage }}</p>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

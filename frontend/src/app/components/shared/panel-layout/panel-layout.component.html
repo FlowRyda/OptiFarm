@@ -1,0 +1,28 @@
+<div *ngIf="backAction" class="mb-2 bg-light">
+  <button (click)="backAction.action()"
+          class="back-button flex items-center text-gray-700 hover:text-gray-900 transition-colors duration-150 p-2 -ml-2 rounded-lg">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" style="margin-right: 4px;">
+      <path fill-rule="evenodd"
+            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+    </svg>
+    Back
+  </button>
+</div>
+
+<div class="header">
+  <h2 class="page-title">{{ title }}</h2>
+  <h6 class="page-subtitle">{{ subtitle }}</h6>
+</div>
+
+<div class="detail-box">
+  <ng-content select="[details]"></ng-content>
+</div>
+
+<div class="action-buttons pb-4">
+  <button
+    *ngFor="let button of actionButtons"
+    [class]="'optiFarm-button ' + button.color"
+    (click)="button.action()">
+    {{ button.label }}
+  </button>
+</div>

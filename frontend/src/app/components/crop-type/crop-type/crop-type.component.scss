@@ -1,0 +1,24 @@
+.left-image {
+  background-size: cover;
+  background-position: center;
+}
+
+.image-full {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.left-side {
+  overflow: hidden;
+}
+
+.right-side {
+  overflow-y: auto;
+}
+
+.content-container {
+  width: 80%;
+  max-width: 350px;
+  margin-top: 5%;
+}

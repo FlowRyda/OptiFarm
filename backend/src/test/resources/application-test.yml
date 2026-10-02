@@ -1,0 +1,7 @@
+logging:
+  file.name: ./log/backend-test.log
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create

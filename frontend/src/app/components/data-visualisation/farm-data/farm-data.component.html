@@ -1,0 +1,109 @@
+<div class="flex-grow-1" xmlns="http://www.w3.org/1999/html">
+  <div class="row h-100">
+    <div class="left col-lg-7 col-md-7 col-sm-6 col-6 d-flex flex-column">
+      <div class="row pt-2 kpi-section">
+        <div class="col-3">
+          <div class="pie-wrap">
+            <canvas id="pie-chart-croptypes"></canvas>
+          </div>
+          <ng-container *ngIf="isLoading">
+            <p class="text-center page-subtitle">Loading your data...</p>
+          </ng-container>
+        </div>
+        <div class="col-3">
+          <div class="container-kpi shadow">
+            <h5>Total Earnings</h5>
+            <p>Estimation as of the data from {{ currentYear }}</p>
+            <h5 class="text-center mt-4">{{ totalEarnings }} $</h5>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="container-kpi shadow">
+            <h5>Difference prev. Year</h5>
+            <p>Estimation as of the data from {{ currentYear }}</p>
+            <h5 class="text-center mt-4"> {{ differencePrevYear | number:'1.2-2' }} %</h5>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="container-kpi shadow">
+            <h5>Number of Harvests</h5>
+            <p>Summed up value over all fields</p>
+            <h5 class="text-center mt-4"> {{ numberOfHarvests }}</h5>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-container mt-4">
+        <canvas id="farm-timeseries"></canvas>
+        <ng-container *ngIf="isLoading">
+          <p class="text-center page-subtitle">Loading your data...</p>
+        </ng-container>
+      </div>
+
+      <div class="chart-container mt-4">
+        <canvas id="field-timeseries"></canvas>
+        <ng-container *ngIf="isLoading">
+          <p class="text-center page-subtitle">Loading your data...</p>
+        </ng-container>
+      </div>
+
+      <div class="chart-container mt-4">
+        <canvas id="scatter-chart-fields"></canvas>
+        <ng-container *ngIf="isLoading">
+          <p class="text-center page-subtitle">Loading your data...</p>
+        </ng-container>
+      </div>
+    </div>
+    <div class="side-container col-lg-5 col-md-5 col-sm-6 col-6 right d-flex flex-column">
+      <h2 class="page-title">Farmer Field Data</h2>
+      <h6 class="page-subtitle">Acquired Data of the owned Fields visualized</h6>
+      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="announceSortChange($event)"
+             class="mat-elevation-z8">
+
+        <ng-container matColumnDef="position">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Position">
+            No.
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.position}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="fieldName">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Field Name">
+            Field Name
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.fieldName}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalEarnings">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by total Earnings">
+            Total Earnings ($)
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.totalEarnings}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="totalQuantity">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by total Quantity">
+            Total Quantity (tons)
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.totalQuantity}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="numberOfHarvests">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header sortActionDescription="Sort by Number of Harvests">
+            Number of Harvests
+          </th>
+          <td mat-cell *matCellDef="let element"> {{element.numberOfHarvests}} </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+
+      <mat-paginator
+        [pageSize]="10"
+        showFirstLastButtons>
+      </mat-paginator>
+
+    </div>
+  </div>
+</div>

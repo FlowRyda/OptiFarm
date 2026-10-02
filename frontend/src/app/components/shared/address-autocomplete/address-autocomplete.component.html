@@ -1,0 +1,25 @@
+<div class="mb-4 position-relative">
+  <label class="form-label">Address</label>
+  <input
+    type="text"
+    class="form-control"
+    [formControl]="searchControl"
+    placeholder="Start typing address..."
+    (blur)="onBlur()"
+    (focus)="showResults = results.length > 0"
+  />
+
+  <ul
+    class="list-group position-absolute w-100"
+    *ngIf="showResults"
+    style="z-index: 1000; max-height: 200px; overflow-y: auto;"
+  >
+    <li
+      class="list-group-item list-group-item-action"
+      *ngFor="let r of results"
+      (click)="onSelect(r)"
+    >
+      {{ r.display_name }}
+    </li>
+  </ul>
+</div>
