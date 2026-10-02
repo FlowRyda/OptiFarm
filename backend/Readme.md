@@ -2,7 +2,9 @@
 
 ## How to run it
 
-### Start the backed
+To start the backend, you need a Postgres instance. Easiest is to run via the postgres-docker-compose.yml
+
+### Start the backend
 `mvn spring-boot:run`
 
 ### Start the backed with test data
