@@ -37,7 +37,7 @@ security:
     prefix: "Bearer "
     login-uri: /api/v1/authentication
   jwt:
-    secret: ?E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn2r5u8x/A?D(G+KbPdSgVkYp3s6v9
+    secret: ${JWT_SECRET}
     type: JWT
     issuer: secure-backend
     audience: secure-app

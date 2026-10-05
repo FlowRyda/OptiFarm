@@ -5,3 +5,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+
+security:
+ jwt:
+   secret: this-is-just-a-simple-test-secret-key-1234567891234567891234567891234567
