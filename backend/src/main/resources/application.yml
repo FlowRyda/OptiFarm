@@ -44,6 +44,9 @@ security:
     # 12 hours in milliseconds
     expiration-time: 43200000
 
+cors:
+  allowed-origins: http://localhost:4200
+
 management:
   server:
     port: 8081

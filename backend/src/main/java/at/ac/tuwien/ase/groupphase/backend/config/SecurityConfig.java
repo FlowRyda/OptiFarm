@@ -2,6 +2,7 @@ package at.ac.tuwien.ase.groupphase.backend.config;
 
 import at.ac.tuwien.ase.groupphase.backend.security.impl.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -40,10 +41,14 @@ public class SecurityConfig {
 
     @Configuration
     public static class CorsConfig implements WebMvcConfigurer {
+
+        @Value("${cors.allowed-origins}")
+        private String[] allowedOrigins;
+
         @Override
         public void addCorsMappings(CorsRegistry registry) {
             registry.addMapping("/**")
-                .allowedOriginPatterns("http://localhost:4200", "https://*.apps.student.inso-w.at")
+                .allowedOriginPatterns(allowedOrigins)
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "HEAD");
         }
     }
