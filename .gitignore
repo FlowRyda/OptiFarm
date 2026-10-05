@@ -1,0 +1,15 @@
+.DS_Store
+.idea/
+runConfigurations/
+
+# logs
+log/
+*.log
+
+# environment config
+.env
+
+# build output, local data
+target/
+node_modules/
+database/
