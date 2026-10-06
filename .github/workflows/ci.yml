@@ -7,7 +7,7 @@ on:
     - main 
 
 permissions:
-  content: read
+  contents: read
 
 jobs:
   backend:
