@@ -6,4 +6,6 @@ services:
     restart: unless-stopped
     container_name: optifarm-frontend
     ports:
-      - "4200:80"
+      - "80:80"
+    depends_on:
+      - backend
