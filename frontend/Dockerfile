@@ -10,6 +10,7 @@ RUN npm run build -- --configuration production
 FROM nginx:alpine
 WORKDIR /usr/share/nginx/html
 
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist/sepr-group-phase/browser ./
 
 EXPOSE 80
