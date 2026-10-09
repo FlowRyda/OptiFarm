@@ -50,7 +50,7 @@ resource "google_compute_instance" "optifarm-vm" {
     ssh-keys = "deploy:${file(var.ssh_public_key_path)}"
   }
 
-  metadata_startup_script
+  metadata_startup_script = file("${path.module}/startup.sh")
 }
 
 output "vm_ip" {
