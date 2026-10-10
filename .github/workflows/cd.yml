@@ -9,7 +9,6 @@ on:
 
 permissions:
     contents: read
-    id-token: write
 
 concurrency:
   group: deploy
@@ -25,6 +24,7 @@ jobs:
     if: (github.event_name == 'workflow_dispatch') || (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success')
     permissions:
       contents: read
+      id-token: write
     env:
       TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
     steps:
@@ -48,7 +48,7 @@ jobs:
         env:
           VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
         run: |
-          print '%s\n' "$VM_SSH_KEY" > "$RUNNER_TEMP/key"
+          printf '%s\n' "$VM_SSH_KEY" > "$RUNNER_TEMP/key"
           chmod 600 "$RUNNER_TEMP/key"
           echo "TF_VAR_ssh_public_key=$(ssh-keygen -y -f "$RUNNER_TEMP/key") optifarm-deploy" >> $GITHUB_ENV
           rm "$RUNNER_TEMP/key"
