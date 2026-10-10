@@ -38,7 +38,7 @@
     "leaflet": "^1.9.4",
     "lodash": "4.17.21",
     "ngx-toastr": "^19.1.0",
-    "ngx-toastr-notifier": "^20.0.9",
+    "ngx-toastr-notifier": "^22.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.1.4",
     "rxjs": "7.8.2",
