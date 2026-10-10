@@ -8,11 +8,10 @@ variable "region" {
 }
 
 variable "zone" {
-  type = string
+  type    = string
   default = "europe-north2-b"
 }
 
-variable "ssh_public_key_path" {
-  type    = string
-  default = "~/.ssh/optifarm-deploy.pub"
+variable "ssh_public_key" {
+  type = string
 }
