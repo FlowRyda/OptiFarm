@@ -7,7 +7,7 @@ COPY checkstyle*.xml .
 
 RUN mvn -B clean package -DskipTests -Dgit.commit.id.skip=true
 
-FROM eclipse-temurin:21-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 COPY --from=builder /app/target/*.jar app.jar
