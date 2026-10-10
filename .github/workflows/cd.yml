@@ -69,7 +69,7 @@ jobs:
       - name: remote GHCR Login
         env:
           VM_HOST: ${{ secrets.VM_HOST }}
-          GHCR_TOKEN: ${{ secrets.GHCR_PAT }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           ssh -i ~/.ssh/deploy_key deploy@$VM_HOST "docker login ghcr.io -u FlowRyda --password-stdin" <<< "$GHCR_TOKEN"
 
