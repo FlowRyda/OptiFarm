@@ -71,9 +71,6 @@ jobs:
       contents: read
       packages: read
 
-    env:
-      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
