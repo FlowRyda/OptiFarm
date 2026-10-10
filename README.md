@@ -83,8 +83,25 @@ The terraform state lives in a versioned GC storage bucket.
 | Checkstyle | style rules, fails the build on violations; runs in `mvn verify` | active |
 | Unit and integration tests, JaCoCo | tests run in CI; JaCoCo writes a coverage report | active |
 | Angular lint and unit tests | `ng lint` and the Karma tests run in CI | active |
-| Dependabot | pull requests for outdated or vulnerable dependencies | **TODO** (in progress) |
-| Gitleaks | secret scanning in the pipeline | **TODO** (in progress) |
+| Dependabot | pull requests for outdated or vulnerable dependencies |active |
+| Gitleaks | secret scanning in the pipeline | active |
+
+#### Dependabot
+
+Dependabot checks Maven, npm, GitHub Actions, Docker and Terraform
+dependencies weekly. It opens pull requests proposing updates.
+We review compatibility and CI results before merging. The updates
+are not merged automatically. 
+
+#### Gitleaks
+
+Gitleaks runs in CI on pull requests and pushes to main. It scans
+commits and the full checked-out Git history for potential secrets,
+with detected values redacted from the output.
+
+A failed scan blocks Docker image building and publishing, which
+also blocks normal automatic deployment. 
+
 
 ## Configuration and secrets
 
@@ -116,7 +133,10 @@ When running the workflow, two more variables are used:
 
 ## Running the application locally
 
-Requirements: Docker, Java 21 and Node 22 (for development mode).
+Requirements:
+- Container mode: Docker Desktop installed and running, with Docker Compose.
+- Development mode: Docker Desktop, Java 21, Maven, and Node 22/npm.
+- Frontend tests: Chrome or Chromium installed.
 
 ### Option 1: everything in containers
 
@@ -133,6 +153,9 @@ Open <http://localhost>. Log in with a generated demo user, for example `0farmer
 ```bash
 docker compose -f backend/postgres-docker-compose.yml up -d     # Postgresql with PostGIS, needs backend/.env
 export JWT_SECRET="$(openssl rand -base64 48)"
+```
+Run backend and frontend in two different terminal 
+```bash
 cd backend && mvn spring-boot:run -Dspring-boot.run.profiles=generateData
 cd frontend && npm ci --legacy-peer-deps && npm start             # http://localhost:4200
 ```
