@@ -10,22 +10,66 @@ on:
 permissions:
     contents: read
 
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+
 jobs:
+  infra:
+    name: Provision Infrastructure
+    runs-on: ubuntu-latest
+    if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success')
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      TF_VAR_project_id: ${{ secrets.GCP_PROJECT_ID }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOY_SHA }}
+
+      - name: Authenticate to GC
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.3
+
+      - name: Derive SSH public key
+        env:
+          VM_SSH_KEY: ${{ secrets.VM_SSH_KEY }}
+        run: |
+          printf '%s\n' "$VM_SSH_KEY" > "$RUNNER_TEMP/key"
+          chmod 600 "$RUNNER_TEMP/key"
+          echo "TF_VAR_ssh_public_key=$(ssh-keygen -y -f "$RUNNER_TEMP/key") optifarm-deploy" >> $GITHUB_ENV
+          rm "$RUNNER_TEMP/key"
+
+      - name: Terraform init
+        working-directory: infra
+        run: terraform init -input=false
+
+      - name: Terraform apply
+        working-directory: infra
+        run: terraform apply -auto-approve -input=false
+
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
+    needs: infra
     if: (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') || (github.event.workflow_run.event == 'push' && github.event.workflow_run.conclusion == 'success')
-
-    concurrency:
-      group: deploy
-      cancel-in-progress: false
 
     permissions:
       contents: read
       packages: read
-
-    env:
-      DEPLOY_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
 
     steps:
       - name: Checkout repository
@@ -42,6 +86,18 @@ jobs:
           printf '%s\n' "$VM_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           printf '%s\n' "$VM_HOST_KEY" > ~/.ssh/known_hosts
+
+      - name: Wait for VM to be ready
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+        run: |
+          for i in $(seq 1 30); do
+          if ssh -i ~/.ssh/deploy_key -o ConnectTimeout=5 deploy@$VM_HOST "docker info >/dev/null 2>&1 && test -d /opt/optifarm"; then
+            echo "VM is ready"; exit 0
+          fi
+          echo "Attempt $i: VM not ready, retrying in 10"; sleep 10
+          done
+          echo "VM did not become ready in time"; exit 1
 
       - name: Copy compose file to VM
         env:

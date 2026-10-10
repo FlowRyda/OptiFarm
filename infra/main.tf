@@ -4,6 +4,11 @@ terraform {
       source = "hashicorp/google"
     }
   }
+
+  backend "gcs" {
+    bucket = "project-af74988b-4242-456b-953-tfstate"
+    prefix = "optifarm"
+  }
 }
 
 provider "google" {
@@ -47,7 +52,7 @@ resource "google_compute_instance" "optifarm-vm" {
   }
 
   metadata = {
-    ssh-keys = "deploy:${file(var.ssh_public_key_path)}"
+    ssh-keys = "deploy:${var.ssh_public_key}"
   }
 
   metadata_startup_script = file("${path.module}/startup.sh")
