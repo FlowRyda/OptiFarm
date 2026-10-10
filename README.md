@@ -160,4 +160,4 @@ complete-docker-compose.yml   whole stack for local use
 
 ## Use of AI-assisted tools
 
-see [AI_USAGE.md](AI_Usage.md).
+In the file AI_USAGE.md.
