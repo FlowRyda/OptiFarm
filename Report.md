@@ -1,4 +1,5 @@
 # OptiFarm: DevOps Project Report
+KTH | DD2482 DevOps | Elena Pan & Moritz Constantin Schepp
 
 ## 1. The Project
 
