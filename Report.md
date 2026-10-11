@@ -10,7 +10,7 @@ The project is running at [http://34.51.196.41](http://34.51.196.41).
 
 ![OptiFarm architecture](assets/image1.png)
 
-OptiFarm uses Spring Boot 3 and Java 21 for the backend, Angular 19 for the frontend, and PostgreSQL with PostGIS for geographical data. The previous project used GitLab and a Kubernetes-style deployment platform. We replaced that setup with GitHub Actions and a Google Cloud Compute Engine VM.
+OptiFarm uses Spring Boot 3 and Java 21 for the backend, Angular 19 for the frontend, and PostgreSQL with PostGIS for geographical data. The previous version of the project used GitLab and a Kubernetes cluster provided by the course's lecture team. We replaced that setup with GitHub Actions, proper secret handling and a Google Cloud Compute Engine VM that runs the containers.
 
 The VM runs three containers through Docker Compose: Angular served by Nginx, Spring Boot and PostGIS. Port 80 is the public entry point through Nginx for the website and API requests. Port 22 is used for SSH deployment and administration. The backend and database ports are not published by production Compose.
 
@@ -40,7 +40,7 @@ Also we need the VM's address and host key as GitHub secrets before the deploy j
 
 GHCR login uses the short lived `GITHUB_TOKEN` instead of a stored personal access token. The SSH host key is pinned in a GitHub secret to verify the VM's identity, although this requires manual setup. Application defaults are defined in `application.yml` and can be overridden by environment variables. `.env.example` files document the configuration, while deployment credentials are supplied through GitHub secrets rather than committed to the repository.
 
-We decided to deploy our system in one VM with Docker Compose instead of using Kubernetes, because the project instructions asked us to build a coherent pipeline and not a large system. We decided to not use e.g. Kubernetes, because that is more suited for scaling large scale applications, and our small system runs well one a small sized VM which makes it a good choice.
+We decided to deploy our system in one VM with Docker Compose instead of using Kubernetes, because the project instructions asked us to build a coherent pipeline and not a large system. We decided to not use e.g. Kubernetes, because that is more suited for scaling large scale applications, and our small system runs well on a small sized VM which makes it a good choice.
 
 ## 5. Quality and Security Automation
 
@@ -62,10 +62,12 @@ Other problems came from workflow configuration. Docker images built in one job 
 
 A big limitation in our project is that we only have a single VM, which if the VM fails, the whole system breaks and Compose updates can briefly interrupt service. Database data survives container replacement through a Docker volume, but there is no automated backup or recovery process, replacing the VM or losing its disk can lose the data.
 
-Another limitation we were willing to live with is that replacing the VM deletes the database. We built a system that mimics a stable environment, so we argue that a VM replacement would not happen. That's why we stick to this decision.
+Another limitation we were willing to live with is that replacing the VM deletes the database. A persistent disk, or a managed database, would fix this. Assuming that we keep the VM running for the system to keep running, so we argue that a VM replacement would not happen. That's why we stick to this decision.
 
 The application currently uses HTTP rather than HTTPS, so passwords and authentication tokens are not encrypted in transit. SSH is reachable from the internet because deployment comes from GitHub hosted runners. Adding TLS, stronger deployment access controls and database backups would be priorities before using real user data.
 
 Some environment files were committed in the original history and later removed from the current repository. We have not rewritten that history. A clean Gitleaks result does not prove those older values were harmless or are no longer used, any exposed credential must be revoked or replaced. A private repository is not a substitute for doing this. But we obviously regenerated fresh production values that were kept secret.
 
 Other limitations include floating container base tags, limited frontend tests and old configuration from the previous course. SHA tags identify application builds, but changing base images still affects reproducibility. Updates, testing and cleanup need ongoing attention.
+
+The AI use can be found in the AI_Usage.md file.
