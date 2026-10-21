@@ -184,3 +184,6 @@ complete-docker-compose.yml   whole stack for local use
 ## Use of AI-assisted tools
 
 In the file AI_USAGE.md.
+
+## Project Report:
+[Click here to Read our Project Report](OptiFarm_DevOps_Report.pdf) 
