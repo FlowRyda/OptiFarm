@@ -166,3 +166,9 @@ jobs:
           VM_HOST: ${{ secrets.VM_HOST }}
         run: |
           ssh -i ~/.ssh/deploy_key deploy@$VM_HOST "cd /opt/optifarm && docker compose -f docker-compose.prod.yml ps && docker compose -f docker-compose.prod.yml logs --tail=100"
+
+      - name: Remove old images
+        env:
+          VM_HOST: ${{ secrets.VM_HOST }}
+        run: |
+          ssh -i ~/.ssh/deploy_key deploy@$VM_HOST "docker image prune -af"
